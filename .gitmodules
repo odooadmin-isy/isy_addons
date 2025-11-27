@@ -1,9 +1,9 @@
 [submodule "isy_ticketing"]
 	path = isy_ticketing
-	url = git@github.com:thtwe/isy_ticketing.git
+	url = git@github.com:odooadmin-isy/isy_ticketing.git
 [submodule "accounting_budget_extension_V7"]
 	path = accounting_budget_extension_V7
-	url = git@github.com:thtwe/accounting_budget_extension_V7.git
+	url = git@github.com:odooadmin-isy/accounting_budget_extension_V7.git
 [submodule "mt_isy"]
 	path = mt_isy
-	url = git@github.com:thtwe/mt_isy.git
+	url = git@github.com:odooadmin-isy/mt_isy.git
