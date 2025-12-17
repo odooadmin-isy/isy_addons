@@ -63,3 +63,12 @@ class PosSession(models.Model):
             'tax_tag_ids': [(6, 0, base_tag_ids)],
         }
         return self._credit_amounts(partial_vals, amount, amount_converted)
+
+    #Override function to pass the new param: use_card
+    def _loader_params_pos_payment_method(self):
+        return {
+            'search_params': {
+            'domain': ['|', ('active', '=', False), ('active', '=', True)],
+            'fields': ['name', 'is_cash_count', 'use_payment_terminal', 'split_transactions', 'type', 'image', 'sequence', 'use_card'],
+            },
+        }

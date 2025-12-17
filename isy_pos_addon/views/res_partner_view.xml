@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_res_partner_form_inherit_isy_card" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.isy_card</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <page name="accounting_disabled" position="after">
+                <page string="ISY Card" name="isy_card">
+                    <group>
+                        <group>
+                            <field name="card_barcode" />
+                            <field name="card_balance" />
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+</odoo>

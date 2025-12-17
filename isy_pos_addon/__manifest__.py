@@ -13,7 +13,16 @@
     'website': "https://www.isyedu.org",
     'category': 'Point of sale',
     'depends': ['point_of_sale'],
-    'data': [],
+    'data': [
+       'views/res_partner_view.xml',
+       'views/pos_view.xml',
+       'views/recharge_history_view.xml',
+    ],
+    'assets': {
+        'point_of_sale._assets_pos': [
+        'isy_pos_addon/static/src/js/payment_screen.js',
+        ],
+    },
     'installable': True,
     'application': False,
     'auto_install': False,
