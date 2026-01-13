@@ -105,13 +105,17 @@ class EmployeeAdvanceExpense(models.Model):
            raise UserError(_('Please add some advance expense lines.'))
         else:
             total_amount = self.total_amount_expense
-            self.name = self.env['ir.sequence'].next_by_code('employee.advance.expense')
+            if self.name == 'New' or self.name == False:
+                self.name = self.env['ir.sequence'].next_by_code('employee.advance.expense')
+            else:
+                self.name = self.name
+
             if self.currency_id and self.company_id and self.currency_id != self.company_id.currency_id:
                         currency_id = self.currency_id
                         rate = currency_id.with_context(date=self.request_date)
                         total_amount = currency_id._convert(self.total_amount_expense, self.company_id.currency_id, self.company_id, self.request_date or fields.Date.today())
             if(250000 > 250000):
-                  raise UserError(_('Cannot confirm this advance as it exceeds $200,000 limit.'))  
+                raise UserError(_('Cannot confirm this advance as it exceeds $200,000 limit.'))
             else:    
                 self.state = 'confirm'
                 self.confirm_date = time.strftime('%Y-%m-%d')
