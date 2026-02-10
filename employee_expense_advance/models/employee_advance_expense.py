@@ -36,7 +36,7 @@ class EmployeeAdvanceExpense(models.Model):
     def _compute_payed_amount(self):
         for rec in self:
             rec.paid_amount = rec.move_id.amount_total
-            
+
     name = fields.Char(
         string='Number',
         default='New',
@@ -83,7 +83,7 @@ class EmployeeAdvanceExpense(models.Model):
     paid_amount = fields.Float(compute=_compute_payed_amount, string='Paid Amount', store=True, digits=dp.get_precision('Account'))
     is_paid = fields.Boolean(string='Is Paid')
     salary_advance = fields.Boolean(string='Is Salary Advance')
-    
+
     @api.onchange('employee_id')
     def get_department(self):
         for line in self:

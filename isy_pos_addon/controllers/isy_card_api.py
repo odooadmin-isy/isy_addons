@@ -189,6 +189,7 @@ class IsyCardAPI(http.Controller):
         order_list = []
         for order in request.env['pos.order'].sudo().search([('partner_id', '=', partner.id),('state','not in',('draft','cancel'))]):
             order_list.append({
+                'vendor_name': order.session_id.config_id.name,
                 'order_number': order.pos_reference,
                 'student_number': partner.display_name,
                 'barcode': partner.card_barcode,
