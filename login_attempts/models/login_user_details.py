@@ -83,7 +83,7 @@ class LoginUpdate(models.Model):
                         'message_type': 'notification',
                         'model': 'login.detail',
                         'res_id': rec.id,
-                        'subtype_id': self.env['ir.model.data'].xmlid_to_res_id('mail.mt_note'),
+                        'subtype_id':self.env.ref('mail.mt_note').id,
                         }
                     message = self.env['mail.message'].create(message_values)
                     rec.show_log = False
