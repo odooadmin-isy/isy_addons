@@ -6,6 +6,7 @@ import odoo.addons.decimal_precision as dp
 from odoo.exceptions import UserError
 from odoo import models, fields, api, _
 from odoo.tools import float_compare, float_is_zero
+
 class EmployeeAdvanceExpense(models.Model):
     _name = 'employee.advance.expense'
     _description = "Employee Advance Expense"
@@ -31,7 +32,13 @@ class EmployeeAdvanceExpense(models.Model):
                 rec.paid_in_currency = rec.company_id.currency_id.id
             else:  
                 rec.paid_in_currency = rec.journal_id.currency_id
-    
+
+    @api.depends('currency_id')
+    def _compute_journal_id(self):
+        for rec in self:
+            default_journal_ids = self.env['ir.config_parameter'].sudo().get_param('isy.advance_default_journal_ids', '88').split(',')
+            rec.journal_id = self.env['account.journal'].search([('id', 'in', default_journal_ids)]).filtered(lambda x: x.currency_id == rec.currency_id)
+
     @api.depends('move_id', 'move_id.amount_total')
     def _compute_payed_amount(self):
         for rec in self:
@@ -73,7 +80,7 @@ class EmployeeAdvanceExpense(models.Model):
                         readonly=True, default='draft', \
                         track_visibility='onchange')
     partner_id = fields.Many2one('res.partner', string='Employee Partner')
-    journal_id = fields.Many2one('account.journal', string='Payment Method')
+    journal_id = fields.Many2one('account.journal', string='Payment Method', compute='_compute_journal_id')
     payment_id = fields.Many2one('account.payment', string='Payment', readonly=True)
     paid_in_currency = fields.Many2one('res.currency', string='Paid in Currency',compute='_compute_paid_currency')
     account_id = fields.Many2one('account.account', string='Asset Account', related='partner_id.property_account_receivable_id')
