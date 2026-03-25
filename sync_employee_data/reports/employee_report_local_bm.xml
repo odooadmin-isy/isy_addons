@@ -4,14 +4,14 @@
     <!-- <report
       id="report_employee_report_exp_bm"
       model="hr.employee"
-      string="Employee Report (Expatriate/Business Manager)"
+      string="Employee Report (Expatriate/Chief Operations Officer)"
       report_type="qweb-pdf"
       name="sync_employee_data.report_employee_exp_bm"
       file="sync_employee_data.report_employee_exp_bm"
       paperformat="sync_employee_data.paperformat_payslip_with_adjustment"/> -->
 
     <record id="report_employee_report_local_bm" model="ir.actions.report">
-        <field name="name">Employee Report (Business Manager)</field>
+        <field name="name">Employee Report (Chief Operations Officer)</field>
         <field name="model">hr.employee</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">sync_employee_data.report_employee_local_bm</field>
@@ -87,7 +87,7 @@
                 <br/>
                 <span>Steven Linn</span>
                 <br/>
-                <span>Business Manager</span>
+                <span>Chief Operations Officer</span>
               </div>
             </div>
           </div>

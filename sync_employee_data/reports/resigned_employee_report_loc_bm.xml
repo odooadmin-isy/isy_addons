@@ -4,14 +4,14 @@
     <!-- <report
       id="report_resigned_employee_report_loc_bm"
       model="hr.employee"
-      string="Resigned Employee Report (Local/Business Manager)"
+      string="Resigned Employee Report (Local/Chief Operations Officer)"
       report_type="qweb-pdf"
       name="sync_employee_data.resigned_report_employee_loc_bm"
       file="sync_employee_data.resigned_report_employee_loc_bm"
       paperformat="sync_employee_data.paperformat_payslip_with_adjustment"/> -->
 
       <record id="report_resigned_employee_report_loc_bm" model="ir.actions.report">
-        <field name="name">Resigned Employee Report (Local/Business Manager)</field>
+        <field name="name">Resigned Employee Report (Local/Chief Operations Officer)</field>
         <field name="model">hr.employee</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">sync_employee_data.resigned_report_employee_loc_bm</field>
@@ -83,7 +83,7 @@
                 <br/>
                 <span>Steven Linn</span>
                 <br/>
-                <span>Business Manager</span>
+                <span>Chief Operations Officer</span>
               </div>
             </div>
           </div>
