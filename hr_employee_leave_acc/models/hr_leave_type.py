@@ -69,9 +69,22 @@ class HrSubLeaveType(models.Model):
 
 		return str(s_fiscal_date)
 
+	def _get_allocated_leaves(self):
+		employee_id = self.env.user.employee_id
+		s_fiscal_date = self.get_fiscal_date()
+		allocated_leaves = self.env['hr.leave.allocation'].search([
+			('employee_id', '=', employee_id.id),
+			('holiday_status_id', '=', self.hr_leave_type_id.id),
+			('state', '=', 'validate'),
+		])
+		return sum(allocation.number_of_days_display for allocation in allocated_leaves)
+
 	def get_remaining_leaves(self):
 		self.ensure_one()
-		max_days = float_round(self.max_days, precision_digits=2) or 0.0
+		if not self.is_personal_leave:
+			max_days = self._get_allocated_leaves()
+		else:
+			max_days = float_round(self.max_days, precision_digits=2) or 0.0
 		taken_sub_leave_days = self._taken_leave()
 		taken_sub_leave_days = sum(leave.number_of_days for leave in taken_sub_leave_days)
 		if self.max_days != self.hr_leave_type_id.max_leaves:
@@ -82,17 +95,24 @@ class HrSubLeaveType(models.Model):
 				remaining = float_round(self.max_days - taken_sub_leave_days, precision_digits=2) or 0.0
 		else:
 			remaining = float_round(self.hr_leave_type_id.virtual_remaining_leaves, precision_digits=2) or 0.0
-
 		return (max(max_days, 0.0), max(remaining, 0.0))
 
 	def _taken_leave(self):
 		employee_id = self.env.user.employee_id
 		s_fiscal_date = self.get_fiscal_date()
+		if self.is_personal_leave:
+			return self.env['hr.leave'].search([
+				('employee_id', '=', employee_id.id),
+				('holiday_status_id', '=', self.hr_leave_type_id.id),
+				('state', 'in', ['validate', 'validate1', 'confirm']),
+				('sub_leave_type_id', '=', self.id),
+				('date_from','>',s_fiscal_date)
+			])
+
 		return self.env['hr.leave'].search([
                 ('employee_id', '=', employee_id.id),
                 ('holiday_status_id', '=', self.hr_leave_type_id.id),
                 ('state', 'in', ['validate', 'validate1', 'confirm']),
-                ('sub_leave_type_id', '=', self.id),
 				('date_from','>',s_fiscal_date)
             ])
 
