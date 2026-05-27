@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_payslip_template">
+    <t t-call="web.html_container">
+        <t t-call="web.external_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="page" style="font-size:16px;">
+
+                    <h2>Pay Slip</h2>
+                    <span t-esc="datetime.datetime.strftime(o.date_from, '%B %Y')"/>
+
+                    <!-- Employee Info -->
+                    <!-- <table class="table table-sm table-bordered"> -->
+                    <table style="border-color:white; width:100%;">
+                        <tr>
+                            <td><strong>Name</strong></td>
+                            <td><span t-field="o.employee_id"/></td>
+                            <td><strong>Designation</strong></td>
+                            <td><span t-field="o.employee_id.job_id"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Address</strong></td>
+                            <td colspan="3">Yangon, Myanmar</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email</strong></td>
+                            <td><span t-field="o.employee_id.work_email"/></td>
+                            <td><strong>Identification No</strong></td>
+                            <td><span t-field="o.employee_id.identification_id"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reference</strong></td>
+                            <td><span t-field="o.name"/></td>
+                            <td><strong>Bank Account</strong></td>
+                            <td><span t-field="o.employee_id.bank_account_id"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Date From</strong></td>
+                            <td><span t-field="o.date_from"/></td>
+                            <td><strong>Date To</strong></td>
+                            <td><span t-field="o.date_to"/></td>
+                        </tr>
+                    </table>
+
+                    <!-- Salary Lines -->
+                    <!-- <table class="table table-sm table-bordered"> -->
+                    <table style="border-color:white; width:100%;">
+                        <thead>
+                            <tr>
+                                <th><strong>Name</strong></th>
+                                <th class="text-right"><strong>Amount</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="old_code" t-value="''"/>
+
+                            <t t-foreach="o.get_visible_lines()" t-as="line">
+
+                                <t t-if="('NET' not in line.code) and ('NET' in old_code)">
+                                    <tr><td colspan="2"><b>Additional Details</b></td></tr>
+                                </t>
+                                <t t-elif="('NET' in line.code) and ('NET' not in old_code)">
+                                    <tr><td colspan="2"/></tr>
+                                </t>
+
+                                <tr>
+                                    <!-- NET line -->
+                                    <t t-if="'NET' in line.code and 'PETTY' not in line.code">
+                                        <td><b><span t-field="line.name"/></b></td>
+                                        <td class="text-right">
+                                            <b><span t-esc="'{0:,.2f}'.format(o.get_adjusted_net())"/></b>
+                                        </td>
+                                    </t>
+
+                                    <!-- Monthly Gross Salary line -->
+                                    <t t-elif="'Monthly Gross Salary' in (line.name or '')">
+                                        <td><b><span t-field="line.name"/></b></td>
+                                        <td class="text-right">
+                                            <b><span t-esc="'{0:,.2f}'.format(o.get_monthly_gross_salary())"/></b>
+                                        </td>
+                                    </t>
+
+                                    <!-- Bank / Petty Cash lines -->
+                                    <t t-elif="'Bank' in (line.name or '') or 'Petty Cash' in (line.name or '')">
+                                        <td><b><span t-field="line.name"/></b></td>
+                                        <td class="text-right">
+                                            <b><span t-esc="'{0:,.2f}'.format(o.get_adjusted_net())"/></b>
+                                        </td>
+                                    </t>
+
+                                    <!-- All other lines -->
+                                    <t t-else="">
+                                        <td><span t-esc="line.name"/></td>
+                                        <td class="text-right">
+                                            <span t-esc="'{0:,.2f}'.format(line.amount)"/>
+                                        </td>
+                                    </t>
+                                </tr>
+
+                                <t t-if="'NET' in line.code">
+                                    <tr><td colspan="2"/></tr>
+                                </t>
+                                <t t-set="old_code" t-value="line.code"/>
+
+                            </t>
+                        </tbody>
+                    </table>
+                    <br/><br/>
+                    <!-- Signature -->
+                   <div class="col-4 pull-right">
+                        <p class="text-center">
+                            <!-- <img src="/hr_payslip_pdf_report/static/src/img/sign.jpg" style="width:180px;height:130px;"/> -->
+                            <img t-att-src="'/hr_payslip_pdf_report/static/src/img/sign.jpg'" style="width:180px;height:130px;"/><br/>
+                            <strong>Authorized signature</strong><br/>
+                            <span style="text-align:center;" class="text-center"><strong>Steven Linn</strong></span><br/>
+                            <span style="text-align:center;" class="text-center">slinn@isyedu.org</span><br/>
+                            <span style="text-align:center;" class="text-center">Chief Operations Officer</span>
+                        </p>
+                   </div>
+
+                    <!-- Adjustment Details -->
+                    <div t-if="o.input_line_ids.filtered(lambda x: x.amount != 0)"
+                         style="page-break-before: always;">
+                        <br/><br/>
+                        <div style="text-decoration:underline;">
+                            <h4>Adjustment Details</h4>
+                        </div>
+                        <table class="table table-sm table-bordered">
+                            <thead>
+                                <tr>
+                                    <th><strong>Adjustment</strong></th>
+                                    <th class="text-right"><strong>Amount</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.input_line_ids.filtered(lambda x: x.amount != 0)"
+                                    t-as="table_line">
+                                    <td><span t-field="table_line.display_name"/></td>
+                                    <td class="text-right"><span t-field="table_line.amount"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Server Action: Print Payslip PDF directly from List/Form -->
+    <record id="action_print_payslip_server" model="ir.actions.server">
+        <field name="name">Print Payslip PDF</field>
+        <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_model_id" ref="hr_payroll.model_hr_payslip"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = env.ref('hr_payslip_pdf_report.action_report_hr_payslip').report_action(records)
+    action = action
+        </field>
+    </record>
+</odoo>
