@@ -7,7 +7,7 @@
                 <div class="page" style="font-size:16px;">
 
                     <h2>Pay Slip</h2>
-                    <span t-esc="datetime.datetime.strftime(o.date_from, '%B %Y')"/>
+                    <span t-esc="datetime.datetime.strftime(o.date_from, '%B %Y')"/><br/><br/>
 
                     <!-- Employee Info -->
                     <!-- <table class="table table-sm table-bordered"> -->
@@ -71,9 +71,9 @@
                                 <tr>
                                     <!-- NET line -->
                                     <t t-if="'NET' in line.code and 'PETTY' not in line.code">
-                                        <td><b><span t-field="line.name"/></b></td>
+                                        <td><b><span t-field="line.name"/></b><br/><br/><br/></td>
                                         <td class="text-right">
-                                            <b><span t-esc="'{0:,.2f}'.format(o.get_adjusted_net())"/></b>
+                                            <b><span t-esc="'{0:,.2f}'.format(o.get_adjusted_net())"/></b><br/><br/><br/>
                                         </td>
                                     </t>
 
