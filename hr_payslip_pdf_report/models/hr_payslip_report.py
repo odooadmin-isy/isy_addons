@@ -42,7 +42,7 @@ class HrPayslip(models.Model):
         gross_amount = sum(self.line_ids.filtered(
             lambda l: 'Monthly Salary' in (l.name or '')
         ).mapped('amount'))
-        return gross_amount - self.get_excluded_amount()
+        return gross_amount
 
 
 class HrPayslipReportHandler(models.AbstractModel):

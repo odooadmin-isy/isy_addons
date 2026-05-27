@@ -3,7 +3,7 @@
 <template id="report_payslip_template">
     <t t-call="web.html_container">
         <t t-call="web.external_layout">
-            <t t-foreach="docs" t-as="o">
+            <t t-if="docs" t-foreach="docs" t-as="o">
                 <div class="page" style="font-size:16px;">
 
                     <h2>Pay Slip</h2>
@@ -41,7 +41,7 @@
                             <td><span t-field="o.date_to"/></td>
                         </tr>
                     </table>
-
+                    <br/><br/>
                     <!-- Salary Lines -->
                     <!-- <table class="table table-sm table-bordered"> -->
                     <table style="border-color:white; width:100%;">
@@ -49,6 +49,11 @@
                             <tr>
                                 <th><strong>Name</strong></th>
                                 <th class="text-right"><strong>Amount</strong></th>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <hr style="color:balck"/>
+                                </td>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,9 +87,9 @@
 
                                     <!-- Bank / Petty Cash lines -->
                                     <t t-elif="'Bank' in (line.name or '') or 'Petty Cash' in (line.name or '')">
-                                        <td><b><span t-field="line.name"/></b></td>
+                                        <td><span t-field="line.name"/></td>
                                         <td class="text-right">
-                                            <b><span t-esc="'{0:,.2f}'.format(o.get_adjusted_net())"/></b>
+                                            <span t-esc="'{0:,.2f}'.format(o.get_adjusted_net())"/>
                                         </td>
                                     </t>
 
@@ -117,7 +122,7 @@
                             <span style="text-align:center;" class="text-center">Chief Operations Officer</span>
                         </p>
                    </div>
-
+                    <br/><br/>
                     <!-- Adjustment Details -->
                     <div t-if="o.input_line_ids.filtered(lambda x: x.amount != 0)"
                          style="page-break-before: always;">
