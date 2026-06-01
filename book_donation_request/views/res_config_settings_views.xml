@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_book_donation" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.book.donation</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app string="Book Donations" name="book_donation_request" groups="book_donation_request.group_book_donation_manager">
+                    <block title="Approval Defaults">
+                        <setting string="Default approvers" help="Pre-filled on new donation requests; librarians can change them while the request is still in draft.">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="book_donation_second_approver_id" class="col-lg-3 o_light_label"/>
+                                    <field name="book_donation_second_approver_id" class="col-lg-9"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

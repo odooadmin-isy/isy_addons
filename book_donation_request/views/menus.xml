@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_book_donation_root"
+              name="Book Donations"
+              parent="isy_ticketing.menu_isy_ticketing_root"
+              sequence="45"
+              groups="book_donation_request.group_book_donation_librarian,book_donation_request.group_book_donation_first_approver,book_donation_request.group_book_donation_second_approver,book_donation_request.group_book_donation_manager"/>
+
+    <menuitem id="menu_book_donation_requests"
+              name="Donation Requests"
+              parent="menu_book_donation_root"
+              action="action_book_donation_request"
+              sequence="10"/>
+
+</odoo>

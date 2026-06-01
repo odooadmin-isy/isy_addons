@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_book_donation_request_tree" model="ir.ui.view">
+        <field name="name">book.donation.request.tree</field>
+        <field name="model">book.donation.request</field>
+        <field name="arch" type="xml">
+            <tree string="Book Donation Requests" decoration-muted="state == 'cancelled'" decoration-danger="state == 'rejected'" decoration-success="state == 'approved'">
+                <field name="name"/>
+                <field name="librarian_id"/>
+                <field name="request_date"/>
+                <field name="donated_to_id"/>
+                <field name="first_approver_id" optional="hide"/>
+                <field name="second_approver_id" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state in ('first_approval', 'second_approval')" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_book_donation_request_search" model="ir.ui.view">
+        <field name="name">book.donation.request.search</field>
+        <field name="model">book.donation.request</field>
+        <field name="arch" type="xml">
+            <search string="Book Donation Requests">
+                <field name="name"/>
+                <field name="librarian_id"/>
+                <field name="donated_to_id"/>
+                <filter name="to_first_approve" string="My First Approval" domain="[('state', '=', 'first_approval'), ('first_approver_id', '=', uid)]"/>
+                <filter name="to_second_approve" string="My Second Approval" domain="[('state', '=', 'second_approval'), ('second_approver_id', '=', uid)]"/>
+                <separator/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="in_approval" string="In Approval" domain="[('state', 'in', ('first_approval', 'second_approval'))]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_librarian" string="Librarian" context="{'group_by': 'librarian_id'}"/>
+                    <filter name="group_donated_to" string="Donated To" context="{'group_by': 'donated_to_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_request_date" string="Request Date" context="{'group_by': 'request_date'}"/>
+                    <filter name="Status" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_book_donation_request_form" model="ir.ui.view">
+        <field name="name">book.donation.request.form</field>
+        <field name="model">book.donation.request</field>
+        <field name="arch" type="xml">
+            <form string="Book Donation Request">
+                <header>
+                    <button name="action_submit" type="object" string="Submit" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="book_donation_request.group_book_donation_librarian,book_donation_request.group_book_donation_manager"/>
+                    <button name="action_first_approve" type="object" string="First Approve" class="oe_highlight"
+                            invisible="state != 'first_approval'"
+                            groups="book_donation_request.group_book_donation_first_approver,book_donation_request.group_book_donation_manager"/>
+                    <button name="action_second_approve" type="object" string="Second Approve" class="oe_highlight"
+                            invisible="state != 'second_approval'"
+                            groups="book_donation_request.group_book_donation_second_approver,book_donation_request.group_book_donation_manager"/>
+                    <button name="action_reject" type="object" string="Reject"
+                            invisible="state not in ('first_approval', 'second_approval')"
+                            groups="book_donation_request.group_book_donation_first_approver,book_donation_request.group_book_donation_second_approver,book_donation_request.group_book_donation_manager"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                            invisible="state != 'draft'"
+                            groups="book_donation_request.group_book_donation_librarian,book_donation_request.group_book_donation_manager"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft"
+                            invisible="state not in ('rejected', 'cancelled')"
+                            groups="book_donation_request.group_book_donation_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,first_approval,second_approval,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="librarian_id" force_save="1"/>
+                            <field name="request_date" readonly="1" force_save="1"/>
+                            <field name="donation_expected_date" readonly="state in ('approved', 'rejected', 'cancelled')"/>
+                            <field name="attachment_1_filename" invisible="1"/>
+                            <field name="attachment_1" filename="attachment_1_filename" string="Attachment 1" widget="binary" />
+                            <field name="attachment_2_filename" invisible="1"/>
+                            <field name="attachment_2" filename="attachment_2_filename" string="Attachment 2" widget="binary" />
+                            <field name="attachment_3_filename" invisible="1"/>
+                            <field name="attachment_3" filename="attachment_3_filename" string="Attachment 3" widget="binary" />
+                        </group>
+                        <group>
+                            <field name="donated_to_id" readonly="state in ('approved', 'rejected', 'cancelled')"/>
+                            <field name="company_id" groups="base.group_multi_company" force_save="1"/>
+                        </group>
+                    </group>
+                    <group string="Approvers" invisible="state == 'draft' and not first_approver_id and not second_approver_id">
+                        <group>
+                            <field name="first_approver_id" readonly="state != 'draft'"/>
+                            <field name="first_approval_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="second_approver_id" readonly="state != 'draft'"/>
+                            <field name="second_approval_date" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Rejection" invisible="state not in ('first_approval', 'second_approval', 'rejected')">
+                        <field name="rejection_reason" readonly="state not in ('first_approval', 'second_approval')" placeholder="Required when rejecting the request"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes" readonly="state != 'draft'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_book_donation_request" model="ir.actions.act_window">
+        <field name="name">Donation Requests</field>
+        <field name="res_model">book.donation.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_book_donation_request_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a book donation list request
+            </p>
+            <p>
+                Librarians submit proposed donation titles. Each request is reviewed in two approval steps.
+            </p>
+        </field>
+    </record>
+
+</odoo>

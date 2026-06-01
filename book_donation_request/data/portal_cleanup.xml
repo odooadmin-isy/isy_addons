@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cleanup old records from removed portal and book_type features -->
+    <delete model="ir.ui.view" search="[('name', '=', 'res.users.form.book.donation')]"/>
+    <delete model="ir.ui.view" search="[('model', '=', 'book.type')]"/>
+    <delete model="ir.actions.act_window" search="[('res_model', '=', 'book.type')]"/>
+    <delete model="ir.ui.menu" search="[('name', '=', 'Book Types')]"/>
+    <delete model="ir.ui.menu" search="[('name', '=', 'Configuration'), ('parent_id.name', '=', 'Book Donations')]"/>
+    <delete model="ir.model.access" search="[('name', 'ilike', 'book.type %')]"/>
+</odoo>
