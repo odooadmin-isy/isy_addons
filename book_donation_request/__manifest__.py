@@ -13,7 +13,6 @@
     'license': 'LGPL-3',
     'depends': ['base', 'mail', 'hr', 'stock', 'isy_ticketing', 'mt_isy'],
     'data': [
-        'data/portal_cleanup.xml',
         'security/security.xml',
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
