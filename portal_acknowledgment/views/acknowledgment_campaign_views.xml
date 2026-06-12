@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_portal_acknowledgment_campaign_tree" model="ir.ui.view">
+        <field name="name">portal.acknowledgment.campaign.tree</field>
+        <field name="model">portal.acknowledgment.campaign</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="active"/>
+                <field name="communication_coordinator_ids" widget="many2many_tags"/>
+                <field name="submission_count"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_portal_acknowledgment_campaign_form" model="ir.ui.view">
+        <field name="name">portal.acknowledgment.campaign.form</field>
+        <field name="model">portal.acknowledgment.campaign</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_submissions"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-check-square-o">
+                            <field name="submission_count" widget="statinfo" string="Submissions"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="communication_coordinator_ids" widget="many2many_tags"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tab 1 — Content" name="tab1">
+                            <group>
+                                <field name="tab1_title"/>
+                            </group>
+                            <field name="tab1_content" widget="html"/>
+                            <field name="tab1_extra_html" widget="html"/>
+                        </page>
+                        <page string="Tab 2 — Video" name="tab2">
+                            <group>
+                                <field name="tab2_title"/>
+                                <field name="tab2_youtube_url" placeholder="https://www.youtube.com/watch?v=..."/>
+                            </group>
+                        </page>
+                        <page string="Tab 3 — Content" name="tab3">
+                            <group>
+                                <field name="tab3_title"/>
+                            </group>
+                            <field name="tab3_content" widget="html"/>
+                            <field name="tab3_extra_html" widget="html"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_portal_acknowledgment_campaign" model="ir.actions.act_window">
+        <field name="name">Acknowledgment Campaigns</field>
+        <field name="res_model">portal.acknowledgment.campaign</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_portal_acknowledgment_root"
+              name="Portal Acknowledgment"
+              parent="hr.menu_hr_root"
+              sequence="95"
+              groups="hr.group_hr_user"/>
+    <menuitem id="menu_portal_acknowledgment_campaign"
+              name="Campaigns"
+              parent="menu_portal_acknowledgment_root"
+              action="action_portal_acknowledgment_campaign"
+              sequence="10"/>
+    <menuitem id="menu_portal_acknowledgment_submission"
+              name="Submissions"
+              parent="menu_portal_acknowledgment_root"
+              action="action_portal_acknowledgment_submissions"
+              sequence="20"/>
+</odoo>

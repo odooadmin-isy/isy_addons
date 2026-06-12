@@ -14,7 +14,8 @@
         - Server action on list and form view (prints directly, no wizard)
         - Supports bulk print for multiple payslips
     """,
-    'author': 'Custom Development',
+    'author': 'ISY Team',
+    'website': 'https://isyedu.org',
     'depends': ['hr_payroll'],
     'data': [
         'report/payslip_report_template.xml',

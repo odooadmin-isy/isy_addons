@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_template_acknowledgment_submitted" model="mail.template">
+        <field name="name">Portal Acknowledgment Submitted</field>
+        <field name="model_id" ref="portal_acknowledgment.model_portal_acknowledgment_submission"/>
+        <field name="subject">Acknowledgment completed: {{ object.employee_id.name }} — {{ object.campaign_id.name }}</field>
+        <field name="email_to">{{ ctx.get('notification_email_to', '') }}</field>
+        <field name="email_cc">{{ ctx.get('notification_email_cc', '') }}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="body_html" type="html">
+            <p>Hello,</p>
+            <p>
+                <strong><t t-out="object.employee_id.name"/></strong>
+                has completed the portal acknowledgment
+                <strong><t t-out="object.campaign_id.name"/></strong>.
+            </p>
+            <ul>
+                <li>Employee: <t t-out="object.employee_id.name"/></li>
+                <li>Email: <t t-out="object.employee_id.work_email or object.user_id.email"/></li>
+                <li>Manager: <t t-out="object.manager_id.name or 'Not set'"/></li>
+                <li>Submitted on: <t t-out="object.submit_date"/></li>
+            </ul>
+            <p>All three sections were acknowledged (read content, watched video, read additional content).</p>
+        </field>
+    </record>
+</odoo>

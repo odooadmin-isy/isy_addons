@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_portal_acknowledgment_submission_tree" model="ir.ui.view">
+        <field name="name">portal.acknowledgment.submission.tree</field>
+        <field name="model">portal.acknowledgment.submission</field>
+        <field name="arch" type="xml">
+            <tree create="0">
+                <field name="submit_date"/>
+                <field name="employee_id"/>
+                <field name="campaign_id"/>
+                <field name="manager_id"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_portal_acknowledgment_submission_form" model="ir.ui.view">
+        <field name="name">portal.acknowledgment.submission.form</field>
+        <field name="model">portal.acknowledgment.submission</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="campaign_id"/>
+                            <field name="employee_id"/>
+                            <field name="user_id"/>
+                            <field name="manager_id"/>
+                            <field name="submit_date"/>
+                        </group>
+                        <group string="Acknowledgments">
+                            <field name="tab1_acknowledged" readonly="1"/>
+                            <field name="tab2_acknowledged" readonly="1"/>
+                            <field name="tab3_acknowledged" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_portal_acknowledgment_submission_search" model="ir.ui.view">
+        <field name="name">portal.acknowledgment.submission.search</field>
+        <field name="model">portal.acknowledgment.submission</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee_id"/>
+                <field name="campaign_id"/>
+                <field name="user_id"/>
+                <filter name="campaign_id" string="Campaign" context="{'group_by': 'campaign_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_portal_acknowledgment_submissions" model="ir.actions.act_window">
+        <field name="name">Acknowledgment Submissions</field>
+        <field name="res_model">portal.acknowledgment.submission</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+    </record>
+
+</odoo>
+

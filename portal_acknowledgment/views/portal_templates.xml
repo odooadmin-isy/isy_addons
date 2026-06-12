@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_acknowledgment_docs_entry" name="Acknowledgment Portal Entry" priority="1">
+        <div class="o_portal_index_card col-md-6 order-0">
+            <a t-att-href="url"
+               t-att-title="title"
+               class="d-flex justify-content-start gap-2 gap-md-3 align-items-center py-3 pe-2 px-md-3 h-100 rounded text-decoration-none text-reset text-bg-light">
+                <div t-if="icon" class="o_portal_icon align-self-start">
+                    <img t-attf-src="#{icon}"/>
+                </div>
+                <div>
+                    <h5 class="mt-0 mb-1" t-out="title"/>
+                    <p class="m-0 text-600" t-out="text"/>
+                </div>
+            </a>
+        </div>
+    </template>
+
+    <template id="portal_my_home_acknowledgment" name="Portal My Home: Acknowledgment" inherit_id="portal.portal_my_home" priority="1">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="show_acknowledgment_portal" t-call="portal_acknowledgment.portal_acknowledgment_docs_entry">
+                <t t-set="icon" t-value="'/portal/static/src/img/portal-connection.svg'"/>
+                <t t-set="title">Acknowledgment</t>
+                <t t-set="text">Complete required reading and video acknowledgment</t>
+                <t t-set="url" t-value="'/my/acknowledgment'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_acknowledgment_form" name="Portal Acknowledgment Form">
+        <t t-call="portal.portal_layout">
+            <t t-set="additional_title">Acknowledgment</t>
+
+            <div class="container py-4 portal_acknowledgment_wrap">
+                <h2 class="mb-3">
+                    <t t-if="campaign" t-esc="campaign.name"/>
+                    <t t-else="">Acknowledgment</t>
+                </h2>
+
+                <t t-if="request.params.get('submitted')">
+                    <div class="alert alert-success" role="alert">
+                        Thank you. Your acknowledgment has been submitted. Your manager and the communication coordinator have been notified by email.
+                    </div>
+                </t>
+
+                <t t-if="request.params.get('error') == 'no_campaign'">
+                    <div class="alert alert-warning" role="alert">
+                        No acknowledgment is available at this time. Please check back later or contact HR.
+                    </div>
+                </t>
+
+                <t t-if="error_message">
+                    <div class="alert alert-danger" role="alert" t-esc="error_message"/>
+                </t>
+
+                <t t-if="not campaign">
+                    <p class="text-muted">There is no active acknowledgment campaign.</p>
+                </t>
+
+                <t t-elif="not is_acknowledgment_eligible">
+                    <div class="alert alert-info" role="alert">
+                        This acknowledgment is only available for newly joined employees in the current period.
+                    </div>
+                </t>
+
+                <t t-elif="already_submitted">
+                    <div class="alert alert-info" role="alert">
+                        You submitted this acknowledgment on
+                        <span t-field="submission.submit_date" t-options="{'widget': 'datetime'}"/>.
+                    </div>
+                </t>
+
+                <t t-else="">
+                    <style>
+                        .o_portal_acknowledgment .o_ack_tab_radio {
+                            position: absolute;
+                            opacity: 0;
+                            pointer-events: none;
+                        }
+                        .o_portal_acknowledgment .o_ack_tab_nav {
+                            display: flex;
+                            flex-wrap: wrap;
+                            list-style: none;
+                            padding: 0;
+                            margin: 0 0 1rem 0;
+                            border-bottom: 1px solid #dee2e6;
+                            gap: 0.25rem;
+                        }
+                        .o_portal_acknowledgment .o_ack_tab_nav li {
+                            margin-bottom: -1px;
+                        }
+                        .o_portal_acknowledgment .o_ack_tab_nav label {
+                            display: block;
+                            padding: 0.5rem 1rem;
+                            border: 1px solid transparent;
+                            border-radius: 0.375rem 0.375rem 0 0;
+                            cursor: pointer;
+                            margin-bottom: 0;
+                            color: #495057;
+                            background: transparent;
+                        }
+                        .o_portal_acknowledgment .o_ack_panel {
+                            display: none;
+                        }
+                        .o_portal_acknowledgment #o_ack_tab_1:checked ~ .o_ack_tab_nav label[for="o_ack_tab_1"],
+                        .o_portal_acknowledgment #o_ack_tab_2:checked ~ .o_ack_tab_nav label[for="o_ack_tab_2"],
+                        .o_portal_acknowledgment #o_ack_tab_3:checked ~ .o_ack_tab_nav label[for="o_ack_tab_3"] {
+                            color: #495057;
+                            background-color: #fff;
+                            border-color: #dee2e6 #dee2e6 #fff;
+                        }
+                        .o_portal_acknowledgment #o_ack_tab_1:checked ~ form .o_ack_panel_1,
+                        .o_portal_acknowledgment #o_ack_tab_2:checked ~ form .o_ack_panel_2,
+                        .o_portal_acknowledgment #o_ack_tab_3:checked ~ form .o_ack_panel_3 {
+                            display: block;
+                        }
+                        .o_portal_acknowledgment .acknowledgment-content img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                    </style>
+
+                    <p class="text-muted mb-4">
+                        Please read all content, watch the full video, check each box, then submit.
+                    </p>
+
+                    <div class="o_portal_acknowledgment">
+                        <input type="radio" name="o_ack_tab" id="o_ack_tab_1" class="o_ack_tab_radio" checked="checked"/>
+                        <input type="radio" name="o_ack_tab" id="o_ack_tab_2" class="o_ack_tab_radio"/>
+                        <input type="radio" name="o_ack_tab" id="o_ack_tab_3" class="o_ack_tab_radio"/>
+
+                        <ul class="o_ack_tab_nav" role="tablist">
+                            <li role="presentation">
+                                <label for="o_ack_tab_1" role="tab">
+                                    <t t-esc="campaign.tab1_title or 'Tab 1'"/>
+                                </label>
+                            </li>
+                            <li role="presentation">
+                                <label for="o_ack_tab_2" role="tab">
+                                    <t t-esc="campaign.tab2_title or 'Tab 2'"/>
+                                </label>
+                            </li>
+                            <li role="presentation">
+                                <label for="o_ack_tab_3" role="tab">
+                                    <t t-esc="campaign.tab3_title or 'Tab 3'"/>
+                                </label>
+                            </li>
+                        </ul>
+
+                        <form id="portal_acknowledgment_form"
+                              action="/my/acknowledgment/submit"
+                              method="post"
+                              class="o_portal_acknowledgment_form">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                            <div class="border rounded p-4 bg-white mb-4 o_ack_tab_panels">
+                                <div class="o_ack_panel o_ack_panel_1" role="tabpanel">
+                                    <div class="acknowledgment-content mb-4" t-out="campaign.tab1_content"/>
+                                    <div class="acknowledgment-content mb-4" t-if="campaign.tab1_extra_html" t-out="campaign.tab1_extra_html"/>
+                                    <div class="form-check">
+                                        <input class="form-check-input js_ack_checkbox"
+                                               type="checkbox"
+                                               name="tab1_acknowledged"
+                                               id="tab1_acknowledged"/>
+                                        <label class="form-check-label" for="tab1_acknowledged">
+                                            I have read and understood the above content.
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="o_ack_panel o_ack_panel_2" role="tabpanel">
+                                    <t t-if="youtube_video_id">
+                                        <div class="ratio ratio-16x9 mb-3">
+                                            <iframe id="acknowledgment_youtube_player"
+                                                    t-attf-src="https://www.youtube.com/embed/{{ youtube_video_id }}?enablejsapi=1&amp;rel=0"
+                                                    title="Acknowledgment video"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowfullscreen="allowfullscreen"/>
+                                        </div>
+                                        <p class="text-muted small js_video_hint">
+                                            Watch the video to the end to enable the confirmation checkbox.
+                                        </p>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="alert alert-warning">
+                                            No YouTube URL is configured for this campaign. Please contact HR.
+                                        </div>
+                                    </t>
+                                    <div class="form-check">
+                                        <input class="form-check-input js_ack_checkbox js_tab2_checkbox"
+                                               type="checkbox"
+                                               name="tab2_acknowledged"
+                                               id="tab2_acknowledged"
+                                               t-att-disabled="youtube_video_id and 'disabled' or None"/>
+                                        <label class="form-check-label" for="tab2_acknowledged">
+                                            I have watched the video.
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="o_ack_panel o_ack_panel_3" role="tabpanel">
+                                    <div class="acknowledgment-content mb-4" t-out="campaign.tab3_content"/>
+                                    <div class="acknowledgment-content mb-4" t-if="campaign.tab3_extra_html" t-out="campaign.tab3_extra_html"/>
+                                    <div class="form-check">
+                                        <input class="form-check-input js_ack_checkbox"
+                                               type="checkbox"
+                                               name="tab3_acknowledged"
+                                               id="tab3_acknowledged"/>
+                                        <label class="form-check-label" for="tab3_acknowledged">
+                                            I have read and understood the above content.
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-danger d-none js_submit_error" role="alert"/>
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-lg js_ack_submit"
+                                    disabled="disabled">
+                                Submit acknowledgment
+                            </button>
+                        </form>
+                    </div>
+
+                    <script type="text/javascript">
+                        (function () {
+                            var form = document.getElementById('portal_acknowledgment_form');
+                            if (!form) {
+                                return;
+                            }
+                            var submitBtn = form.querySelector('.js_ack_submit');
+                            var errorBox = form.querySelector('.js_submit_error');
+                            var checkboxes = form.querySelectorAll('.js_ack_checkbox');
+                            var tab2Checkbox = form.querySelector('.js_tab2_checkbox');
+
+                            function updateSubmitState() {
+                                var allChecked = checkboxes.length &amp;&amp;
+                                    Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+                                submitBtn.disabled = !allChecked;
+                            }
+
+                            Array.prototype.forEach.call(checkboxes, function (checkbox) {
+                                checkbox.addEventListener('change', updateSubmitState);
+                            });
+
+                            form.addEventListener('submit', function (ev) {
+                                var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+                                if (!allChecked) {
+                                    ev.preventDefault();
+                                    errorBox.classList.remove('d-none');
+                                    errorBox.textContent = 'Please read all content, watch the video, and check all boxes before submitting.';
+                                }
+                            });
+
+                            updateSubmitState();
+
+                            var iframe = document.getElementById('acknowledgment_youtube_player');
+                            if (!iframe || !tab2Checkbox) {
+                                return;
+                            }
+
+                            function enableTab2Checkbox() {
+                                tab2Checkbox.disabled = false;
+                                var hint = document.querySelector('.js_video_hint');
+                                if (hint) {
+                                    hint.textContent = 'You may now confirm that you have watched the video.';
+                                }
+                                updateSubmitState();
+                            }
+
+                            function initYoutubePlayer() {
+                                if (!window.YT || !window.YT.Player) {
+                                    enableTab2Checkbox();
+                                    return;
+                                }
+                                new window.YT.Player(iframe, {
+                                    events: {
+                                        onStateChange: function (event) {
+                                            if (event.data === window.YT.PlayerState.ENDED) {
+                                                enableTab2Checkbox();
+                                            }
+                                        },
+                                    },
+                                });
+                            }
+
+                            if (window.YT &amp;&amp; window.YT.Player) {
+                                initYoutubePlayer();
+                                return;
+                            }
+
+                            if (!document.getElementById('portal_acknowledgment_youtube_api')) {
+                                var tag = document.createElement('script');
+                                tag.id = 'portal_acknowledgment_youtube_api';
+                                tag.src = 'https://www.youtube.com/iframe_api';
+                                document.head.appendChild(tag);
+                            }
+
+                            var previousReady = window.onYouTubeIframeAPIReady;
+                            window.onYouTubeIframeAPIReady = function () {
+                                if (previousReady) {
+                                    previousReady();
+                                }
+                                initYoutubePlayer();
+                            };
+                        })();
+                    </script>
+                </t>
+            </div>
+        </t>
+    </template>
+</odoo>

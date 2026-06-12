@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_portal_acknowledgment_manager" model="res.groups">
+        <field name="name">Portal Acknowledgment Manager</field>
+        <field name="category_id" ref="base.module_category_human_resources"/>
+        <field name="implied_ids" eval="[(4, ref('hr.group_hr_user'))]"/>
+    </record>
+
+    <record id="portal_acknowledgment_submission_rule_portal" model="ir.rule">
+        <field name="name">Portal user: own acknowledgment submissions</field>
+        <field name="model_id" ref="model_portal_acknowledgment_submission"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="portal_acknowledgment_campaign_rule_portal" model="ir.rule">
+        <field name="name">Portal user: active acknowledgment campaigns</field>
+        <field name="model_id" ref="model_portal_acknowledgment_campaign"/>
+        <field name="domain_force">[('active', '=', True)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>
