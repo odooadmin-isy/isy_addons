@@ -235,3 +235,44 @@ class IsyCardAPI(http.Controller):
                 } for line in order.lines
             ]
         })
+
+    #/api/v1/barcode?id={id}&utype={student/staff/parent}
+    @http.route('/api/v1/barcode', type='http', auth='none', methods=['GET'], csrf=False)
+    def get_barcode(self, **kw):
+        # Check API key
+        error = self._authenticate()
+        if error:
+            return error
+
+        user_type = kw.get("utype")
+        user_id = kw.get("id")
+
+        if not user_type or not user_id:
+            return self._get_response(404, {
+                "error": "Invalid input."
+            })
+
+        # Get barcode related to user
+        partner = False
+        if user_type == 'student':
+            partner = request.env['res.partner'].sudo().search([('dcid', '=', int(user_id))], limit=1)
+        elif user_type == 'staff':
+            employee = request.env['hr.employee'].sudo().search([('dcid', '=', int(user_id))], limit=1)
+            if employee:
+                partner = employee.address_id
+        elif user_type == 'parent':
+            partner = request.env['res.partner'].sudo().search([('dcid', '=', int(user_id))], limit=1)
+        else:
+            return self._get_response(404, {
+                "error": "Invalid user type."
+            })
+
+        if not partner:
+            return self._get_response(404, {
+                "error": "User not found."
+            })
+
+        return self._get_response(200, {
+            "barcode": partner.card_barcode,
+            "name": partner.display_name
+        })
