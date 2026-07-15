@@ -1,5 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- pos.config view -->
+    <record id="pos_config_view_form_inherit_isy_card" model="ir.ui.view">
+        <field name="name">pos.config.form.inherit.isy_card</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/div" position="after">
+                <setting string="Vendor Payment" help="Enable vendor payment">
+                    <field name="is_vendor_payment" />
+                    <div class="row mt16 o_settings_container" invisible="not is_vendor_payment">
+                        <div class="row">
+                            <label string="Vendor" for="vendor_id" class="col-lg-4 o_light_label"/>
+                            <field name="vendor_id" />
+                        </div>
+                        <div class="row">
+                            <label string="Commission Journal" for="commission_journal_id" class="col-lg-4 o_light_label"/>
+                            <field name="commission_journal_id" />
+                        </div>
+                        <div class="row">
+                            <label string="Commission Percentage" for="commission_percentage" class="col-lg-4 o_light_label"/>
+                            <field name="commission_percentage" />
+                        </div>
+                        <div class="row">
+                            <label string="POS Payment Account" for="pos_payment_account_id" class="col-lg-4 o_light_label"/>
+                            <field name="pos_payment_account_id" />
+                        </div>
+                        <div class="row">
+                            <label string="Adjustment Account" for="adjustment_account_id" class="col-lg-4 o_light_label"/>
+                            <field name="adjustment_account_id" />
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- pos.session view -->
+    <record id="view_pos_session_form_inherit_commission" model="ir.ui.view">
+        <field name="name">pos.session.form.inherit.commission</field>
+        <field name="model">pos.session</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='move_id']" position="after">
+                <field name="commission_move_id" readonly="1" groups="account.group_account_readonly"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- pos.payment.method view -->
     <record id="pos_payment_method_view_form_inherit_isy_card" model="ir.ui.view">
         <field name="name">pos.payment.method.form.inherit.isy_card</field>
         <field name="model">pos.payment.method</field>
@@ -12,7 +61,8 @@
         </field>
     </record>
 
-    <record id="view_pos_order_line_pivot_custom" model="ir.ui.view">
+    <!-- pos.order.line view -->
+    <!-- <record id="view_pos_order_line_pivot_custom" model="ir.ui.view">
         <field name="name">pos.order.line.pivot.custom</field>
         <field name="model">pos.order.line</field>
         <field name="arch" type="xml">
@@ -23,8 +73,9 @@
                 <field name="create_date" type="col" interval="day"/>
             </pivot>
         </field>
-    </record>
+    </record> -->
 
+    <!-- pos.order.line action -->
     <record id="action_pos_order_line_custom" model="ir.actions.server">
         <field name="name">Order lines</field>
         <field name="model_id" ref="point_of_sale.model_pos_order_line"/>
@@ -35,7 +86,7 @@
     </record>
 
     <menuitem id="menu_pos_order_line_day"
-        name="Order Lines"
+        name="Order Lines Daily"
         parent="point_of_sale.menu_point_of_sale"
         action="isy_pos_addon.action_pos_order_line_custom"
         groups="point_of_sale.group_pos_user"/>

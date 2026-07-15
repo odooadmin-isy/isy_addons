@@ -7,6 +7,13 @@
         <field name="inherit_id" ref="account.view_partner_property_form"/>
         <field name="arch" type="xml">
             <page name="accounting_disabled" position="after">
+                <page string="Guardian Info" name="guardian">
+                    <group>
+                        <group>
+                            <field name="guardian_code" readonly="1" />
+                        </group>
+                    </group>
+                </page>
                 <page string="Student Info" name="student">
                     <group>
                         <group>

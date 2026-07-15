@@ -261,7 +261,7 @@ class IsyCardAPI(http.Controller):
             if employee:
                 partner = employee.address_id
         elif user_type == 'parent':
-            partner = request.env['res.partner'].sudo().search([('dcid', '=', int(user_id))], limit=1)
+            partner = request.env['res.partner'].sudo().search([('guardian_code', '=', user_id)], limit=1)
         else:
             return self._get_response(404, {
                 "error": "Invalid user type."

@@ -35,6 +35,6 @@ class PosOrderLineActionHelper(models.AbstractModel):
             'type': 'ir.actions.act_window',
             'name': 'Order lines',
             'res_model': 'pos.order.line',
-            'view_mode': 'tree,pivot',
+            'view_mode': 'tree',
             'domain': domain,
         }
