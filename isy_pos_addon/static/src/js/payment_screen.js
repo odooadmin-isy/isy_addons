@@ -53,9 +53,10 @@ patch(PaymentScreen.prototype, {
             }
     
             // Fetch customer by barcode
+            const searchBarcode = barcode.replace(/^0+/, '');
             const [partner] = await this.orm.searchRead(
                 'res.partner',
-                [['card_barcode', '=', barcode]],
+                [['card_barcode', '=', searchBarcode]],
                 ['id', 'name', 'card_balance']
             );
     

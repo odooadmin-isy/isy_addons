@@ -21,6 +21,11 @@ class PosOrder(models.Model):
             else:
                 raise UserError(f"Insufficient card balance for customer {partner.name}. Required: {amount}, Available: {partner.card_balance}")
 
+
+class PosOrderLineActionHelper(models.Model):
+    _inherit = 'pos.order.line'
+    _order = 'id desc'
+
 class PosOrderLineActionHelper(models.AbstractModel):
     _name = 'pos.order.line.action.helper'
 
