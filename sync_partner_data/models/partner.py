@@ -76,12 +76,10 @@ class Partner(models.Model):
 		return name, first_name, last_name, middle_name
 
 	def get_guardian_name(self, value):
-		name = ""
-		if(value.get('guardian_firstname', '')):
-			name = value.get('guardian_firstname')+" "+value.get('guardian_lastname', '')
-		if name == " ":
-			print("Name is empty: ", value)
-		return name
+		first_name = value.get("guardian_firstname") or ""
+		last_name = value.get("guardian_lastname") or ""
+
+		return f"{first_name} {last_name}".strip()
 
 	def get_header(self):
 		myurl = 'https://powerschool.isyedu.org/oauth/access_token/'

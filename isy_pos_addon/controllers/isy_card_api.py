@@ -60,6 +60,18 @@ class IsyCardAPI(http.Controller):
     def date_to_string(self, date):
         return fields.Datetime.to_string(self.convert_timezone(date))
 
+    def _get_partner(self, user_id, user_type):
+        if user_type == 'student':
+            partner = request.env['res.partner'].sudo().search([('dcid', '=', int(user_id))], limit=1)
+        elif user_type == 'staff':
+            employee = request.env['hr.employee'].sudo().search([('dcid', '=', int(user_id))], limit=1)
+            if employee:
+                partner = employee.address_id
+        else:
+            partner = request.env['res.partner'].sudo().search([('guardian_code', '=', user_id)], limit=1)
+
+        return partner
+
     @http.route('/api/v1/card_balance', type='http', auth='none', methods=['GET'], csrf=False)
     def card_balance(self, **kw):
         # Check API key
@@ -252,20 +264,13 @@ class IsyCardAPI(http.Controller):
                 "error": "Invalid input."
             })
 
-        # Get barcode related to user
-        partner = False
-        if user_type == 'student':
-            partner = request.env['res.partner'].sudo().search([('dcid', '=', int(user_id))], limit=1)
-        elif user_type == 'staff':
-            employee = request.env['hr.employee'].sudo().search([('dcid', '=', int(user_id))], limit=1)
-            if employee:
-                partner = employee.address_id
-        elif user_type == 'parent':
-            partner = request.env['res.partner'].sudo().search([('guardian_code', '=', user_id)], limit=1)
-        else:
+        if user_type not in ['student', 'staff', 'parent']:
             return self._get_response(404, {
                 "error": "Invalid user type."
             })
+
+        # Get barcode related to user
+        partner = self._get_partner(user_id, user_type)
 
         if not partner:
             return self._get_response(404, {
@@ -275,4 +280,50 @@ class IsyCardAPI(http.Controller):
         return self._get_response(200, {
             "barcode": partner.card_barcode,
             "name": partner.display_name
+        })
+
+
+    #/api/v1/set_barcode?id={id}&utype={student/staff/parent}&barcode={barcode}&amount={amount}
+    @http.route('/api/v1/set_barcode', type='http', auth='none', methods=['PUT'], csrf=False)
+    def set_barcode(self, **kw):
+        # Check API key
+        error = self._authenticate()
+        if error:
+            return error
+
+        user_type = kw.get("utype")
+        user_id = kw.get("id")
+        barcode = kw.get("barcode")
+        amount = kw.get("amount")
+
+        # Validate input
+        if not user_type or not user_id or not barcode or not self.check_number(amount):
+            return self._get_response(400, {
+                "error": "Missing or invalid parameters."
+            })
+
+        if user_type not in ['student', 'staff', 'parent']:
+            return self._get_response(404, {
+                "error": "Invalid user type."
+            })
+
+        # Get barcode related to user
+        partner = self._get_partner(user_id, user_type)
+
+        if not partner:
+            return self._get_response(404, {
+                "error": "User not found."
+            })
+
+        partner.sudo().write({"card_barcode": barcode, "card_balance": amount})
+
+        # Add the recharge history
+        request.env['isy.card.recharge.history'].sudo().create({
+            'partner_id': partner.id,
+            'amount': amount
+        })
+
+        return self._get_response(200, {
+            "barcode": barcode,
+            "balance": float(amount)
         })
