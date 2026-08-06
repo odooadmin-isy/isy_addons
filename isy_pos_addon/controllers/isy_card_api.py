@@ -87,6 +87,7 @@ class IsyCardAPI(http.Controller):
                 "error": "Invalid input."
             })
 
+        barcode = barcode.lstrip('0')
         # Check partner related to barcode
         partner = request.env['res.partner'].sudo().search([('card_barcode', '=', barcode)], limit=1)
 
@@ -116,6 +117,7 @@ class IsyCardAPI(http.Controller):
                 "error": "Missing or invalid parameters."
             })
 
+        barcode = barcode.lstrip('0')
         # Check partner related to barcode
         partner = request.env['res.partner'].sudo().search([('card_barcode', '=', barcode)], limit=1)
 
@@ -155,6 +157,7 @@ class IsyCardAPI(http.Controller):
         if not barcode:
             return Response(json.dumps({"error": "invalid_input"}), status=400, mimetype='application/json')
 
+        barcode = barcode.lstrip('0')
         # Check partner related to barcode
         partner = request.env['res.partner'].sudo().search([('card_barcode', '=', barcode)], limit=1)
 
@@ -189,6 +192,7 @@ class IsyCardAPI(http.Controller):
         if not barcode:
             return Response(json.dumps({"error": "invalid_input"}), status=400, mimetype='application/json')
 
+        barcode = barcode.lstrip('0')
         # Check partner related to barcode
         partner = request.env['res.partner'].sudo().search([('card_barcode', '=', barcode)], limit=1)
 
@@ -302,6 +306,7 @@ class IsyCardAPI(http.Controller):
                 "error": "Missing or invalid parameters."
             })
 
+        barcode = barcode.lstrip('0')
         if user_type not in ['student', 'staff', 'parent']:
             return self._get_response(404, {
                 "error": "Invalid user type."
@@ -317,13 +322,56 @@ class IsyCardAPI(http.Controller):
 
         partner.sudo().write({"card_barcode": barcode, "card_balance": amount})
 
-        # Add the recharge history
-        request.env['isy.card.recharge.history'].sudo().create({
-            'partner_id': partner.id,
-            'amount': amount
-        })
+        # # Add the recharge history
+        # request.env['isy.card.recharge.history'].sudo().create({
+        #     'partner_id': partner.id,
+        #     'amount': amount
+        # })
 
         return self._get_response(200, {
             "barcode": barcode,
             "balance": float(amount)
+        })
+
+    @http.route('/api/v1/subtract', type='http', auth='none', methods=['PUT'], csrf=False)
+    def subtract_balance(self, **kw):
+        # Check API key
+        error = self._authenticate()
+        if error:
+            return error
+
+        barcode = kw.get("barcode")
+        amount = kw.get("amount")
+
+        # Validate input
+        if not barcode or not self.check_number(amount):
+            return self._get_response(400, {
+                "error": "Missing or invalid parameters."
+            })
+
+        barcode = barcode.lstrip('0')
+        # Check partner related to barcode
+        partner = request.env['res.partner'].sudo().search([('card_barcode', '=', barcode)], limit=1)
+
+        if not partner:
+            return self._get_response(404, {
+                "error": "Partner not found."
+            })
+
+        # Add the amount to the existing balance
+        old_balance = partner.card_balance or 0
+        new_balance = float(old_balance) - float(amount)
+        partner.sudo().write({"card_balance": new_balance})
+
+        # # Add the subtract history
+        # request.env['isy.card.recharge.history'].sudo().create({
+        #     'partner_id': partner.id,
+        #     'amount': -float(amount)
+        # })
+
+        return self._get_response(200, {
+            "barcode": barcode,
+            "old_balance": float(old_balance),
+            "subtracted_amount": float(amount),
+            "new_balance": float(new_balance)
         })
