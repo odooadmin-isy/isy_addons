@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-    <menuitem id="isy_menu_isy_card" name="ISY Card" parent="account_accountant.menu_accounting" sequence="5"/>
+    <menuitem id="isy_menu_isy_card" name="ISY Card" /> <!--parent="account_accountant.menu_accounting" sequence="5"/> -->
 
         <!-- Card Recharge History Tree -->
         <record model="ir.ui.view" id="isy_clinic_request_calendar">

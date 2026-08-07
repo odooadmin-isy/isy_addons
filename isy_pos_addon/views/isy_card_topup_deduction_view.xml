@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Card Topup/Deduction Tree -->
+        <record model="ir.ui.view" id="isy_card_topup_deduction_tree">
+            <field name="name">ISY Card Topup/Deduction Tree</field>
+            <field name="model">isy.card.topup.deduction</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="partner_id"/>
+                    <field name="barcode"/>
+                    <field name="usage_type"/>
+                    <field name="amount"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Card Topup Form -->
+        <record model="ir.ui.view" id="isy_card_topup_deduction_form">
+            <field name="name">ISY Card Topup/Deduction Form</field>
+            <field name="model">isy.card.topup.deduction</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_topup"
+                                string="Top Up"
+                                type="object"
+                                class="btn-primary"
+                                invisible="usage_type != 'topup' or state != 'draft'"/>
+
+                        <button name="action_deduction"
+                                string="Deduction"
+                                type="object"
+                                class="btn-primary"
+                                invisible="usage_type != 'deduction' or state != 'draft'"/>
+                    </header>
+
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="barcode"/>
+                                <field name="partner_id" force_save="1"/>
+                                <field name="usage_type" readonly="1" force_save="1"/>
+                                <field name="amount"/>
+                                <field name="state" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Card Topup Action -->
+        <record model="ir.actions.act_window" id="menu_isy_card_topup_action">
+            <field name="name">Card Topup</field>
+            <field name="res_model">isy.card.topup.deduction</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('usage_type', '=', 'topup')]</field>
+            <field name="context">{'default_usage_type': 'topup'}</field>
+        </record>
+
+        <!-- Card Deduction Action -->
+        <record model="ir.actions.act_window" id="menu_isy_card_deduction_action">
+            <field name="name">Card Deduction</field>
+            <field name="res_model">isy.card.topup.deduction</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('usage_type', '=', 'deduction')]</field>
+            <field name="context">{'default_usage_type': 'deduction'}</field>
+        </record>
+
+        <!-- Card Topup Menu --> 
+        <menuitem
+            name="Card Topup"
+            id="menu_isy_card_topup"
+            parent="isy_menu_isy_card"
+            action="menu_isy_card_topup_action"
+            sequence="10"/>
+
+        <!-- Card Deduction Menu --> 
+        <menuitem
+            name="Card Deduction"
+            id="menu_isy_card_deduction"
+            parent="isy_menu_isy_card"
+            action="menu_isy_card_deduction_action"
+            sequence="12"/>
+    </data>
+</odoo>
