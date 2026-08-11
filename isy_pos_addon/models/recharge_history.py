@@ -13,3 +13,4 @@ class RechargeHistory(models.Model):
     student_number = fields.Char(string='Student Number', related='partner_id.student_number', store=True)
     amount = fields.Float(string='Amount', required=True)
     date = fields.Datetime(string='Date', required=True, default=lambda self: fields.Datetime.now())
+    ptype = fields.Char(string='Payment Type')

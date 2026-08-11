@@ -12,7 +12,7 @@ class CardTopupDeduction(models.Model):
     usage_type = fields.Selection([('topup', 'Topup'), ('deduction', 'Deduction')], string='Type', required=True)
     barcode = fields.Char(string='Barcode')
     amount = fields.Float(string='Amount', required=True)
-    date = fields.Datetime(string='Date', required=True, default=fields.Datetime.now())
+    date = fields.Datetime(string='Date', required=True, default=lambda self: fields.Datetime.now())
     state = fields.Selection([('draft', 'Draft'), ('done', 'Done')], string='State', required=True, default='draft')
 
     @api.onchange('barcode')
@@ -31,7 +31,8 @@ class CardTopupDeduction(models.Model):
         self.partner_id.card_balance += self.amount
         self.env['isy.card.recharge.history'].sudo().create({
             'partner_id': self.partner_id.id,
-            'amount': self.amount
+            'amount': self.amount,
+            'ptype': 'Cash'
         })
         self.state = 'done'
 

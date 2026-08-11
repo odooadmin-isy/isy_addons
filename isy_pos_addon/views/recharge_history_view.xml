@@ -11,9 +11,11 @@
                 <tree default_order='name desc'>
                     <field name="partner_id"/>
                     <field name="student_number"/>
+                    <field name="ptype"/>
                     <field name="barcode"/>
                     <field name="amount"/>
                     <field name="create_date"/>
+                    <field name="date"/>
                 </tree>
             </field>
         </record>

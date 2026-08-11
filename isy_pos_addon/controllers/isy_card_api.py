@@ -110,9 +110,10 @@ class IsyCardAPI(http.Controller):
 
         barcode = kw.get("barcode")
         amount = kw.get("amount")
+        ptype = kw.get("ptype")
 
         # Validate input
-        if not barcode or not self.check_number(amount):
+        if not barcode or not self.check_number(amount) or not ptype:
             return self._get_response(400, {
                 "error": "Missing or invalid parameters."
             })
@@ -134,7 +135,8 @@ class IsyCardAPI(http.Controller):
         # Add the recharge history
         request.env['isy.card.recharge.history'].sudo().create({
             'partner_id': partner.id,
-            'amount': amount
+            'amount': amount,
+            'ptype': ptype
         })
 
         return self._get_response(200, {
@@ -306,6 +308,7 @@ class IsyCardAPI(http.Controller):
                 "error": "Missing or invalid parameters."
             })
 
+        amount = amount or 0.00
         barcode = barcode.lstrip('0')
         if user_type not in ['student', 'staff', 'parent']:
             return self._get_response(404, {
@@ -320,13 +323,7 @@ class IsyCardAPI(http.Controller):
                 "error": "User not found."
             })
 
-        partner.sudo().write({"card_barcode": barcode, "card_balance": amount})
-
-        # # Add the recharge history
-        # request.env['isy.card.recharge.history'].sudo().create({
-        #     'partner_id': partner.id,
-        #     'amount': amount
-        # })
+        partner.sudo().write({"card_barcode": barcode, "card_balance": float(partner.card_balance) + float(amount)})
 
         return self._get_response(200, {
             "barcode": barcode,
@@ -362,12 +359,6 @@ class IsyCardAPI(http.Controller):
         old_balance = partner.card_balance or 0
         new_balance = float(old_balance) - float(amount)
         partner.sudo().write({"card_balance": new_balance})
-
-        # # Add the subtract history
-        # request.env['isy.card.recharge.history'].sudo().create({
-        #     'partner_id': partner.id,
-        #     'amount': -float(amount)
-        # })
 
         return self._get_response(200, {
             "barcode": barcode,
