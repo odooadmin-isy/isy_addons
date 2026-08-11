@@ -12,4 +12,4 @@ class RechargeHistory(models.Model):
     barcode = fields.Char(string='Barcode', related='partner_id.card_barcode', store=True)
     student_number = fields.Char(string='Student Number', related='partner_id.student_number', store=True)
     amount = fields.Float(string='Amount', required=True)
-    date = fields.Datetime(string='Date', required=True, default=fields.Datetime.now())
+    date = fields.Datetime(string='Date', required=True, default=lambda self: fields.Datetime.now())

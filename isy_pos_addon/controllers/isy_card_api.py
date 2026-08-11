@@ -174,7 +174,7 @@ class IsyCardAPI(http.Controller):
                 'student_number': history.student_number,
                 'barcode': history.barcode,
                 'amount': history.amount,
-                'date': self.date_to_string(history.date)
+                'date': self.date_to_string(history.create_date)
             })
         
         return self._get_response(200, history_list)

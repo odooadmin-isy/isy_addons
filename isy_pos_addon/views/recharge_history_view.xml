@@ -13,7 +13,7 @@
                     <field name="student_number"/>
                     <field name="barcode"/>
                     <field name="amount"/>
-                    <field name="date"/>
+                    <field name="create_date"/>
                 </tree>
             </field>
         </record>
