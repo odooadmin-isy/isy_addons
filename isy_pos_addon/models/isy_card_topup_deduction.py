@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 class CardTopupDeduction(models.Model):
     _name = 'isy.card.topup.deduction'
@@ -23,11 +24,15 @@ class CardTopupDeduction(models.Model):
                 limit=1
             )
             self.partner_id = partner
+            self.barcode = self.barcode.lstrip('0')
         else:
             self.partner_id = False
 
     def action_topup(self):
         self.ensure_one()
+        if self.amount <= 0:
+            raise ValidationError(_('Amount must be greater than 0.00.'))
+
         self.partner_id.card_balance += self.amount
         self.env['isy.card.recharge.history'].sudo().create({
             'partner_id': self.partner_id.id,
