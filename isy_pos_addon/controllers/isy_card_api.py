@@ -136,7 +136,7 @@ class IsyCardAPI(http.Controller):
         request.env['isy.card.recharge.history'].sudo().create({
             'partner_id': partner.id,
             'amount': amount,
-            'ptype': ptype
+            'ptype': ptype.upper()
         })
 
         return self._get_response(200, {
@@ -309,7 +309,6 @@ class IsyCardAPI(http.Controller):
                 "error": "Missing or invalid parameters."
             })
 
-        amount = amount or 0.00
         barcode = barcode.lstrip('0')
         if user_type not in ['student', 'staff', 'parent']:
             return self._get_response(404, {
@@ -324,7 +323,7 @@ class IsyCardAPI(http.Controller):
                 "error": "User not found."
             })
 
-        partner.sudo().write({"card_barcode": barcode, "card_balance": float(partner.card_balance) + float(amount)})
+        partner.sudo().write({"card_barcode": barcode, "card_balance": amount})
 
         return self._get_response(200, {
             "barcode": barcode,
