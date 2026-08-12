@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+            <menuitem id="isy_menu_isy_card" name="ISY Card" />
+
+            <!-- Card History Root Menu -->
+            <menuitem
+                name="Card History"
+                id="menu_isy_card_history_root"
+                parent="isy_menu_isy_card"
+                sequence="10"/>
+            
+            <!-- Card Topup/Deduction Root Menu -->
+            <menuitem
+                name="Card Topup/Deduction"
+                id="menu_isy_card_topup_deduction_root"
+                parent="isy_menu_isy_card"
+                sequence="20"/>
+            
+            <!-- Partner Card Balance Root Menu -->
+            <menuitem id="menu_partner_card_balance_root"
+              name="Partner Card Balance"
+              parent="isy_menu_isy_card"
+              sequence="30"/>
+    </data>
+</odoo>

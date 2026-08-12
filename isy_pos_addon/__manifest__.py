@@ -14,11 +14,14 @@
     'category': 'Point of sale',
     'depends': ['point_of_sale'],
     'data': [
+       'views/menu_view.xml',
        'views/res_partner_view.xml',
        'views/pos_view.xml',
+       'views/set_barcode_log_view.xml',
        'views/recharge_history_view.xml',
        'views/isy_card_usage_history_view.xml',
        'views/isy_card_topup_deduction_view.xml',
+       'wizard/partner_card_balance_view.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

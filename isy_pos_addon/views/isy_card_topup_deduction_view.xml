@@ -2,6 +2,17 @@
 <odoo>
     <data>
 
+        <!-- Card Topup/Deduction Search -->
+        <record model="ir.ui.view" id="isy_card_topup_deduction_search">
+            <field name="name">ISY Card Topup/Deduction Search</field>
+            <field name="model">isy.card.topup.deduction</field>
+            <field name="arch" type="xml">
+                <search>
+                    <filter string="Created Date" name="group_created_date" context="{'group_by': 'create_date'}"/>
+                </search>
+            </field>
+        </record>
+
         <!-- Card Topup/Deduction Tree -->
         <record model="ir.ui.view" id="isy_card_topup_deduction_tree">
             <field name="name">ISY Card Topup/Deduction Tree</field>
@@ -59,7 +70,7 @@
             <field name="res_model">isy.card.topup.deduction</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('usage_type', '=', 'topup')]</field>
-            <field name="context">{'default_usage_type': 'topup'}</field>
+            <field name="context">{'default_usage_type': 'topup', 'group_by': 'create_date:day'}</field>
         </record>
 
         <!-- Card Deduction Action -->
@@ -68,14 +79,14 @@
             <field name="res_model">isy.card.topup.deduction</field>
             <field name="view_mode">tree,form</field>
             <field name="domain">[('usage_type', '=', 'deduction')]</field>
-            <field name="context">{'default_usage_type': 'deduction'}</field>
+            <field name="context">{'default_usage_type': 'deduction', 'group_by': 'create_date:day'}</field>
         </record>
 
         <!-- Card Topup Menu --> 
         <menuitem
             name="Card Topup"
             id="menu_isy_card_topup"
-            parent="isy_menu_isy_card"
+            parent="isy_pos_addon.menu_isy_card_topup_deduction_root"
             action="menu_isy_card_topup_action"
             sequence="10"/>
 
@@ -83,7 +94,7 @@
         <menuitem
             name="Card Deduction"
             id="menu_isy_card_deduction"
-            parent="isy_menu_isy_card"
+            parent="isy_pos_addon.menu_isy_card_topup_deduction_root"
             action="menu_isy_card_deduction_action"
             sequence="12"/>
     </data>

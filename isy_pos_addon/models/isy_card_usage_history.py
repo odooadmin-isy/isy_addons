@@ -5,7 +5,7 @@ from odoo import models, fields
 class CardUsageHistory(models.Model):
     _name = 'isy.card.usage.history'
     _description = 'ISY Card Usage History'
-    _order = 'date desc'
+    _order = 'create_date desc'
 
     partner_id = fields.Many2one('res.partner', string='Partner', required=True)
     name = fields.Char(string='Name', related='partner_id.name')

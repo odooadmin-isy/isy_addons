@@ -301,10 +301,10 @@ class IsyCardAPI(http.Controller):
         user_type = kw.get("utype")
         user_id = kw.get("id")
         barcode = kw.get("barcode")
-        amount = kw.get("amount")
+        # amount = kw.get("amount") #neglect for now (12 Aug 2026)
 
         # Validate input
-        if not user_type or not user_id or not barcode or not self.check_number(amount):
+        if not user_type or not user_id or not barcode:
             return self._get_response(400, {
                 "error": "Missing or invalid parameters."
             })
@@ -323,11 +323,17 @@ class IsyCardAPI(http.Controller):
                 "error": "User not found."
             })
 
-        partner.sudo().write({"card_barcode": barcode, "card_balance": amount})
+        old_barcode = partner.card_barcode
+        partner.sudo().write({"card_barcode": barcode})
+        request.env['isy.set.barcode.log'].sudo().create({
+            'partner_id': partner.id,
+            'old_barcode': old_barcode,
+            'new_barcode': barcode
+        })
 
         return self._get_response(200, {
-            "barcode": barcode,
-            "balance": float(amount)
+            "barcode": barcode
+            # "balance": float(amount)
         })
 
     @http.route('/api/v1/subtract', type='http', auth='none', methods=['PUT'], csrf=False)

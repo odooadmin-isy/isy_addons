@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Set Barcode Log Tree -->
+        <record model="ir.ui.view" id="isy_set_barcode_log_tree">
+            <field name="name">Card Set Barcode History Tree</field>
+            <field name="model">isy.set.barcode.log</field>
+            <field name="arch" type="xml">
+                <tree default_order='name desc'>
+                    <field name="partner_id"/>
+                    <field name="old_barcode"/>
+                    <field name="new_barcode"/>
+                    <field name="amount"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!-- Set Barcode Log Action -->
+        <record model="ir.actions.act_window" id="menu_isy_set_barcode_log_action">
+            <field name="name">Card Set Barcode History</field>
+            <field name="res_model">isy.set.barcode.log</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{'group_by': 'create_date:day'}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <!-- Set Barcode Log Menu --> 
+        <menuitem
+            name="Set Barcode History"
+            id="menu_isy_set_barcode_log"
+            parent="isy_pos_addon.menu_isy_card_history_root"
+            action="menu_isy_set_barcode_log_action"
+            sequence="10"/>
+    </data>
+</odoo>

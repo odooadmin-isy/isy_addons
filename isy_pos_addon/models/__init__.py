@@ -6,3 +6,4 @@ from . import pos_order
 from . import recharge_history
 from . import isy_card_usage_history
 from . import isy_card_topup_deduction
+from . import set_barcode_log

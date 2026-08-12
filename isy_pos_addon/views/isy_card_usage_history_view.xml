@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-    <menuitem id="isy_menu_isy_card" name="ISY Card" /> <!--parent="account_accountant.menu_accounting" sequence="5"/> -->
+
+        <!-- Card Usage History Search -->
+        <record model="ir.ui.view" id="isy_card_usage_history_search">
+            <field name="name">ISY Card Usage History Search</field>
+            <field name="model">isy.card.usage.history</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="partner_id"/>
+                    <field name="student_number"/>
+                    <field name="barcode"/>
+                    <filter string="Created Date" name="group_created_date" context="{'group_by': 'create_date:day'}"/>
+                </search>
+            </field>
+        </record>
 
         <!-- Card Usage History Tree -->
         <record model="ir.ui.view" id="isy_card_usage_history_tree">
@@ -26,7 +39,7 @@
             <field name="name">Card Usage History</field>
             <field name="res_model">isy.card.usage.history</field>
             <field name="view_mode">tree</field>
-            <field name="context">{}</field>
+            <field name="context">{'group_by': 'create_date:day'}</field>
             <field name="domain">[]</field>
         </record>
 
@@ -34,7 +47,7 @@
         <menuitem
             name="Card Usage History"
             id="menu_isy_card_usage_history"
-            parent="isy_menu_isy_card"
+            parent="isy_pos_addon.menu_isy_card_history_root"
             action="menu_isy_card_usage_history_action"
             sequence="9"/>
     </data>
