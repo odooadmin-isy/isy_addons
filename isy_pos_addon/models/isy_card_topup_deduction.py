@@ -39,8 +39,9 @@ class CardTopupDeduction(models.Model):
     def action_deduction(self):
         self.ensure_one()
         self.partner_id.card_balance -= self.amount
-        # self.env['isy.card.recharge.history'].sudo().create({
-        #     'partner_id': self.partner_id.id,
-        #     'amount': -self.amount
-        # })
+        self.env['isy.card.usage.history'].sudo().create({
+            'partner_id': self.partner_id.id,
+            'amount': self.amount,
+            'ptype': 'Deduction'
+        })
         self.state = 'done'

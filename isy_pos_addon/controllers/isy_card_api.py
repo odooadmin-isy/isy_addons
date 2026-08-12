@@ -206,14 +206,15 @@ class IsyCardAPI(http.Controller):
         # Get all invoices related to partner
         order_list = []
         for order in request.env['pos.order'].sudo().search([('partner_id', '=', partner.id),('state','not in',('draft','cancel'))]):
-            order_list.append({
-                'vendor_name': order.session_id.config_id.name,
-                'order_number': order.pos_reference,
-                'student_number': partner.display_name,
-                'barcode': partner.card_barcode,
-                'amount': order.payment_ids[0].amount if order.payment_ids else 0.00,
-                'date': self.date_to_string(order.date_order)
-            })
+            if order.session_id.config_id.is_vendor_payment:
+                order_list.append({
+                    'vendor_name': order.session_id.config_id.name,
+                    'order_number': order.pos_reference,
+                    'student_number': partner.display_name,
+                    'barcode': partner.card_barcode,
+                    'amount': order.payment_ids[0].amount if order.payment_ids else 0.00,
+                    'date': self.date_to_string(order.date_order)
+                })
         
         return self._get_response(200, order_list)
 

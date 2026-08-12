@@ -17,6 +17,7 @@
        'views/res_partner_view.xml',
        'views/pos_view.xml',
        'views/recharge_history_view.xml',
+       'views/isy_card_usage_history_view.xml',
        'views/isy_card_topup_deduction_view.xml',
     ],
     'assets': {

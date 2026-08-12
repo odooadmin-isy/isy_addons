@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    <menuitem id="isy_menu_isy_card" name="ISY Card" /> <!--parent="account_accountant.menu_accounting" sequence="5"/> -->
+
+        <!-- Card Usage History Tree -->
+        <record model="ir.ui.view" id="isy_card_usage_history_tree">
+            <field name="name">ISY Card Usage History Tree</field>
+            <field name="model">isy.card.usage.history</field>
+            <field name="arch" type="xml">
+                <tree default_order='name desc'>
+                    <field name="partner_id"/>
+                    <field name="student_number"/>
+                    <field name="ptype"/>
+                    <field name="order_ref"/>
+                    <field name="barcode"/>
+                    <field name="amount"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <!-- Card Usage History Action -->
+        <record model="ir.actions.act_window" id="menu_isy_card_usage_history_action">
+            <field name="name">Card Usage History</field>
+            <field name="res_model">isy.card.usage.history</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{}</field>
+            <field name="domain">[]</field>
+        </record>
+
+        <!-- Card Usage History Menu --> 
+        <menuitem
+            name="Card Usage History"
+            id="menu_isy_card_usage_history"
+            parent="isy_menu_isy_card"
+            action="menu_isy_card_usage_history_action"
+            sequence="9"/>
+    </data>
+</odoo>
