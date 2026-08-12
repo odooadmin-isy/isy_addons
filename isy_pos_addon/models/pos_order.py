@@ -21,12 +21,12 @@ class PosOrder(models.Model):
             else:
                 raise UserError(f"Insufficient card balance for customer {partner.name}. Required: {amount}, Available: {partner.card_balance}")
 
-        self.env['isy.card.usage.history'].sudo().create({
-            'partner_id': partner.id,
-            'amount': amount,
-            'ptype': 'PoS Payment',
-            'order_ref': order.pos_reference,
-        })
+            self.env['isy.card.usage.history'].sudo().create({
+                'partner_id': partner.id,
+                'amount': amount,
+                'ptype': 'PoS Payment',
+                'order_ref': order.pos_reference,
+            })
 
 class PosOrderLineActionHelper(models.Model):
     _inherit = 'pos.order.line'
