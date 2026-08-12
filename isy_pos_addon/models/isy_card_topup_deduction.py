@@ -36,6 +36,8 @@ class CardTopupDeduction(models.Model):
         self.partner_id.card_balance += self.amount
         self.env['isy.card.recharge.history'].sudo().create({
             'partner_id': self.partner_id.id,
+            'barcode': self.barcode,
+            'student_number': self.partner_id.student_number,
             'amount': self.amount,
             'ptype': 'Cash'
         })
@@ -47,6 +49,8 @@ class CardTopupDeduction(models.Model):
         self.env['isy.card.usage.history'].sudo().create({
             'partner_id': self.partner_id.id,
             'amount': self.amount,
+            'barcode': self.barcode,
+            'student_number': self.partner_id.student_number,
             'ptype': 'Deduction'
         })
         self.state = 'done'

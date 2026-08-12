@@ -11,4 +11,4 @@ class SetBarcodeLog(models.Model):
     name = fields.Char(string='Name', related='partner_id.name')
     old_barcode = fields.Char(string='Old Barcode')
     new_barcode = fields.Char(string='New Barcode')
-    amount = fields.Float(string='Current Balance', related='partner_id.card_balance')
+    amount = fields.Float(string='Current Balance')

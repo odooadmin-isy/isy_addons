@@ -136,6 +136,8 @@ class IsyCardAPI(http.Controller):
         request.env['isy.card.recharge.history'].sudo().create({
             'partner_id': partner.id,
             'amount': amount,
+            'barcode': partner.card_barcode,
+            'student_number': partner.student_number,
             'ptype': ptype.upper()
         })
 
@@ -324,11 +326,13 @@ class IsyCardAPI(http.Controller):
             })
 
         old_barcode = partner.card_barcode
+        current_balance = partner.card_balance
         partner.sudo().write({"card_barcode": barcode})
         request.env['isy.set.barcode.log'].sudo().create({
             'partner_id': partner.id,
             'old_barcode': old_barcode,
-            'new_barcode': barcode
+            'new_barcode': barcode,
+            'amount': current_balance
         })
 
         return self._get_response(200, {

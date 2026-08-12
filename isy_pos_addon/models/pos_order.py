@@ -24,6 +24,8 @@ class PosOrder(models.Model):
             self.env['isy.card.usage.history'].sudo().create({
                 'partner_id': partner.id,
                 'amount': amount,
+                'barcode': partner.card_barcode,
+                'student_number': partner.student_number,
                 'ptype': 'PoS Payment',
                 'order_ref': order.pos_reference,
             })
