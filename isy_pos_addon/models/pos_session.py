@@ -95,7 +95,7 @@ class PosSession(models.Model):
         total_commission_amount = 0.0
         total_commission_amount_converted = 0.0
 
-        # Credit lines: payment method accounts + commission (session currency -> amount_currency)
+        # POS Payment lines
         for payment_account, totals in account_totals.items():
             total_amount = totals['amount']
             total_amount_converted = totals['amount_converted']
@@ -107,12 +107,23 @@ class PosSession(models.Model):
             total_commission_amount += commission_amount
             total_commission_amount_converted += commission_amount_converted
 
+            #Credit line for POS Payment
             line_vals.append((0, 0, self._prepare_commission_line_vals(
                 _('POS Payment %s - %s', payment_account.display_name, self.name),
                 payment_account,
                 total_amount,
                 total_amount_converted,
                 credit=True,
+            )))
+
+            #Debit line for POS Payment
+            line_vals.append((0, 0, self._prepare_commission_line_vals(
+                _('POS Payment - %s', self.name),
+                pos_payment_account,
+                total_amount,
+                total_amount_converted,
+                credit=False,
+                partner=vendor,
             )))
 
         if not float_is_zero(total_commission_amount, precision_rounding=self.currency_id.rounding):
@@ -126,15 +137,15 @@ class PosSession(models.Model):
             )))
 
         # Debit lines: POS payment account
-        if not float_is_zero(pos_payment_amount, precision_rounding=self.currency_id.rounding):
-            line_vals.append((0, 0, self._prepare_commission_line_vals(
-                _('POS Payment - %s', self.name),
-                pos_payment_account,
-                pos_payment_amount,
-                pos_payment_amount_converted,
-                credit=False,
-                partner=vendor,
-            )))
+        # if not float_is_zero(pos_payment_amount, precision_rounding=self.currency_id.rounding):
+        #     line_vals.append((0, 0, self._prepare_commission_line_vals(
+        #         _('POS Payment - %s', self.name),
+        #         pos_payment_account,
+        #         pos_payment_amount,
+        #         pos_payment_amount_converted,
+        #         credit=False,
+        #         partner=vendor,
+        #     )))
 
         if not float_is_zero(total_commission_amount, precision_rounding=self.currency_id.rounding):
             line_vals.append((0, 0, self._prepare_commission_line_vals(
@@ -277,3 +288,9 @@ class PosSession(models.Model):
         })
         account_payment.action_post()
         return account_payment.move_id.line_ids.filtered(lambda line: line.account_id == account_payment.destination_account_id)
+
+    def _get_balancing_account(self):
+        result = super(PosSession, self)._get_balancing_account()
+        if self.config_id.is_vendor_payment:
+            return self.config_id.adjustment_account_id
+        return result

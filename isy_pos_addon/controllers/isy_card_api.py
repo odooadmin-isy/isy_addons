@@ -72,6 +72,10 @@ class IsyCardAPI(http.Controller):
 
         return partner
 
+    def _is_barcode_in_use(self, partner, barcode):
+        existing_partner = request.env['res.partner'].sudo().search([('card_barcode', '=', barcode), ('id', '!=', partner.id)])
+        return bool(existing_partner)
+
     @http.route('/api/v1/card_balance', type='http', auth='none', methods=['GET'], csrf=False)
     def card_balance(self, **kw):
         # Check API key
@@ -323,6 +327,11 @@ class IsyCardAPI(http.Controller):
         if not partner:
             return self._get_response(404, {
                 "error": "User not found."
+            })
+
+        if self._is_barcode_in_use(partner, barcode):
+            return self._get_response(404, {
+                "error": "Barcode already in use."
             })
 
         old_barcode = partner.card_barcode
