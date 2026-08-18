@@ -7,7 +7,7 @@
             <field name="name">Card Set Barcode History Tree</field>
             <field name="model">isy.set.barcode.log</field>
             <field name="arch" type="xml">
-                <tree default_order='name desc'>
+                <tree default_order='create_date desc'>
                     <field name="partner_id"/>
                     <field name="old_barcode"/>
                     <field name="new_barcode"/>

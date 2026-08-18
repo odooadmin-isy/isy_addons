@@ -6,15 +6,17 @@ from odoo.exceptions import ValidationError
 class CardTopupDeduction(models.Model):
     _name = 'isy.card.topup.deduction'
     _description = 'ISY Card Topup/Deduction'
-    _order = 'date desc'
+    _inherit = ['mail.thread']
+    _order = 'create_date desc'
 
     partner_id = fields.Many2one('res.partner', string='Partner', readonly=True)
     name = fields.Char(string='Name', related='partner_id.name')
     usage_type = fields.Selection([('topup', 'Topup'), ('deduction', 'Deduction')], string='Type', required=True)
-    barcode = fields.Char(string='Barcode')
-    amount = fields.Float(string='Amount', required=True)
+    barcode = fields.Char(string='Barcode', track_visibility='onchange')
+    amount = fields.Float(string='Amount', required=True, track_visibility='onchange')
     date = fields.Datetime(string='Date', required=True, default=lambda self: fields.Datetime.now())
-    state = fields.Selection([('draft', 'Draft'), ('done', 'Done')], string='State', required=True, default='draft')
+    state = fields.Selection([('draft', 'Draft'), ('done', 'Done')], string='State',
+                    required=True, default='draft', track_visibility='onchange')
 
     @api.onchange('barcode')
     def _onchange_barcode(self):

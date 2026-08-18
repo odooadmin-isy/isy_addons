@@ -10,3 +10,4 @@ class PosConfig(models.Model):
     commission_journal_id = fields.Many2one('account.journal', string='Commission Journal')
     pos_payment_account_id = fields.Many2one('account.account', string='POS Payment Account')
     adjustment_account_id = fields.Many2one('account.account', string='Adjustment Account')
+    vendor_control_account_id = fields.Many2one('account.account', string='Vendor Control Account')

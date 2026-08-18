@@ -12,11 +12,13 @@ class PosSession(models.Model):
     _inherit = 'pos.session'
 
     commission_move_id = fields.Many2one('account.move', string='Commission Entry', readonly=True, copy=False)
+    card_sale_payment_move_id = fields.Many2one('account.move', string='Card Sale Payment Entry', readonly=True, copy=False)
 
     def _validate_session(self, balancing_account=False, amount_to_balance=0, bank_payment_method_diffs=None):
         result = super()._validate_session(balancing_account, amount_to_balance, bank_payment_method_diffs)
         if result is True:
             self._create_commission_account_move()
+            self._create_card_sale_payment_account_move()
         return result
 
     def _get_vendor_payment_default_account(self, payment_method):
@@ -49,7 +51,7 @@ class PosSession(models.Model):
             if not float_is_zero(totals['amount'], precision_rounding=self.currency_id.rounding)
         }
 
-    def _prepare_commission_line_vals(self, name, account, amount, amount_converted, credit=True, partner=False):
+    def _prepare_journal_line_vals(self, name, account, amount, amount_converted, credit=True, partner=False):
         """Build move line vals with currency conversion support."""
         partial_vals = {
             'name': name,
@@ -61,6 +63,70 @@ class PosSession(models.Model):
             return self._credit_amounts(partial_vals, amount, amount_converted)
         return self._debit_amounts(partial_vals, amount, amount_converted)
 
+    # For Vendor Payable Journal
+    def _create_card_sale_payment_account_move(self):
+        self.ensure_one()
+        if self.card_sale_payment_move_id:
+            return self.card_sale_payment_move_id
+
+        config = self.config_id
+        if not config.is_vendor_payment:
+            return self.env['account.move']
+
+        pos_payment_account = config.pos_payment_account_id
+        vendor_control_account = config.vendor_control_account_id
+        if not pos_payment_account or not vendor_control_account:
+            raise UserError(_(
+                'Please configure POS Payment Account and Vendor Control Account on POS config "%s".',
+                config.display_name,
+            ))
+
+        account_totals = self._get_payment_totals_by_account()
+        date = fields.Date.context_today(self)
+        is_card_sale_payment = False
+        for payment_method in self.payment_method_ids:
+            if payment_method.use_card:
+                default_account_id = payment_method.journal_id.default_account_id
+                if default_account_id not in account_totals:
+                    break
+
+                is_card_sale_payment = True
+                card_sale_payment_amount = account_totals[default_account_id]['amount']
+                card_sale_payment_amount_converted = self._amount_converter(card_sale_payment_amount, date, True)
+
+                line_vals = []
+                # Credit line for Card Sale Payment
+                line_vals.append((0, 0, self._prepare_journal_line_vals(
+                    _('Card Sale Payment - %s', self.name),
+                    vendor_control_account,
+                    card_sale_payment_amount,
+                    card_sale_payment_amount_converted,
+                    credit=True,
+                )))
+
+                # Debit line for Card Sale Payment
+                line_vals.append((0, 0, self._prepare_journal_line_vals(
+                    _('Card Sale Payment - %s', self.name),
+                    pos_payment_account,
+                    card_sale_payment_amount,
+                    card_sale_payment_amount_converted,
+                    credit=False,
+                )))
+
+        if is_card_sale_payment:
+            move = self.env['account.move'].sudo().with_company(self.company_id).create({
+                'journal_id': payment_method.journal_id.id,
+                'date': date,
+                'ref': _('Card Sale Payment %s', self.name),
+                'line_ids': line_vals,
+            })
+            move.action_post()
+            self.card_sale_payment_move_id = move.id
+            return move
+
+        return self.env['account.move']
+
+    # For Commission Journal
     def _create_commission_account_move(self):
         self.ensure_one()
         if self.commission_move_id:
@@ -72,15 +138,16 @@ class PosSession(models.Model):
 
         commission_percentage = config.commission_percentage
         commission_journal = config.commission_journal_id
-        pos_payment_account = config.pos_payment_account_id
         adjustment_account = config.adjustment_account_id
+        vendor_control_account = config.vendor_control_account_id
         vendor = config.vendor_id
 
         if not commission_percentage:
             return self.env['account.move']
-        if not commission_journal or not commission_journal.default_account_id or not pos_payment_account or not adjustment_account or not vendor:
+        if not commission_journal or not commission_journal.default_account_id or\
+                not adjustment_account or not vendor_control_account or not vendor:
             raise UserError(_(
-                'Please configure Commission Journal (with default account), POS Payment Account, Adjustment Account, and Vendor on POS config "%s".',
+                'Please configure Commission Journal (with default account), Adjustment Account, Vendor Control Account, and Vendor on POS config "%s".',
                 config.display_name,
             ))
 
@@ -90,10 +157,12 @@ class PosSession(models.Model):
 
         date = fields.Date.context_today(self)
         line_vals = []
-        pos_payment_amount = 0.0
-        pos_payment_amount_converted = 0.0
         total_commission_amount = 0.0
         total_commission_amount_converted = 0.0
+
+        is_card_sale_payment = False
+        card_sale_payment_amount = 0.0
+        card_sale_payment_amount_converted = 0.0
 
         # POS Payment lines
         for payment_account, totals in account_totals.items():
@@ -102,13 +171,11 @@ class PosSession(models.Model):
             commission_amount = self.currency_id.round(total_amount * commission_percentage / 100.0)
             commission_amount_converted = self._amount_converter(commission_amount, date, True)
 
-            pos_payment_amount += total_amount
-            pos_payment_amount_converted += total_amount_converted
             total_commission_amount += commission_amount
             total_commission_amount_converted += commission_amount_converted
 
-            #Credit line for POS Payment
-            line_vals.append((0, 0, self._prepare_commission_line_vals(
+            #Credit line for POS Payment - Payment Account
+            line_vals.append((0, 0, self._prepare_journal_line_vals(
                 _('POS Payment %s - %s', payment_account.display_name, self.name),
                 payment_account,
                 total_amount,
@@ -116,18 +183,19 @@ class PosSession(models.Model):
                 credit=True,
             )))
 
-            #Debit line for POS Payment
-            line_vals.append((0, 0, self._prepare_commission_line_vals(
+            #Debit line for POS Payment - Vendor Control Account
+            line_vals.append((0, 0, self._prepare_journal_line_vals(
                 _('POS Payment - %s', self.name),
-                pos_payment_account,
+                vendor_control_account,
                 total_amount,
                 total_amount_converted,
                 credit=False,
                 partner=vendor,
             )))
 
+        # Credit line for Commission
         if not float_is_zero(total_commission_amount, precision_rounding=self.currency_id.rounding):
-            line_vals.append((0, 0, self._prepare_commission_line_vals(
+            line_vals.append((0, 0, self._prepare_journal_line_vals(
                 _('%s Commission - %s percent', vendor.name, commission_percentage),
                 commission_journal.default_account_id,
                 total_commission_amount,
@@ -136,57 +204,16 @@ class PosSession(models.Model):
                 partner=vendor,
             )))
 
-        # Debit lines: POS payment account
-        # if not float_is_zero(pos_payment_amount, precision_rounding=self.currency_id.rounding):
-        #     line_vals.append((0, 0, self._prepare_commission_line_vals(
-        #         _('POS Payment - %s', self.name),
-        #         pos_payment_account,
-        #         pos_payment_amount,
-        #         pos_payment_amount_converted,
-        #         credit=False,
-        #         partner=vendor,
-        #     )))
-
+        # Debit line for Commission
         if not float_is_zero(total_commission_amount, precision_rounding=self.currency_id.rounding):
-            line_vals.append((0, 0, self._prepare_commission_line_vals(
+            line_vals.append((0, 0, self._prepare_journal_line_vals(
                 _('POS Payment Commission for %s', vendor.name),
-                pos_payment_account,
+                vendor_control_account,
                 total_commission_amount,
                 total_commission_amount_converted,
                 credit=False,
                 partner=vendor,
             )))
-
-        # Balance residual difference (e.g. 0.01 USD) on adjustment account
-        company_currency = self.company_id.currency_id
-        total_debit = sum(vals[2].get('debit', 0.0) for vals in line_vals)
-        total_credit = sum(vals[2].get('credit', 0.0) for vals in line_vals)
-        difference = company_currency.round(total_debit - total_credit)
-        if not company_currency.is_zero(difference):
-            # difference is in company currency; convert back for amount_currency if needed
-            difference_session = 0.0
-            if not self.is_in_company_currency:
-                difference_session = company_currency._convert(
-                    difference, self.currency_id, self.company_id, date
-                )
-            if difference > 0:
-                # Excess debit -> credit adjustment
-                line_vals.append((0, 0, self._prepare_commission_line_vals(
-                    _('Adjustment - %s', self.name),
-                    adjustment_account,
-                    difference_session,
-                    difference,
-                    credit=True,
-                )))
-            else:
-                # Excess credit -> debit adjustment
-                line_vals.append((0, 0, self._prepare_commission_line_vals(
-                    _('Adjustment - %s', self.name),
-                    adjustment_account,
-                    abs(difference_session),
-                    abs(difference),
-                    credit=False,
-                )))
 
         move = self.env['account.move'].sudo().with_company(self.company_id).create({
             'journal_id': commission_journal.id,

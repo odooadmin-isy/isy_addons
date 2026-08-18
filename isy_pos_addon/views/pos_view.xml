@@ -23,6 +23,10 @@
                             <field name="commission_percentage" />
                         </div>
                         <div class="row">
+                            <label string="Vendor Control Account" for="vendor_control_account_id" class="col-lg-4 o_light_label"/>
+                            <field name="vendor_control_account_id" />
+                        </div>
+                        <div class="row">
                             <label string="POS Payment Account" for="pos_payment_account_id" class="col-lg-4 o_light_label"/>
                             <field name="pos_payment_account_id" />
                         </div>
@@ -44,6 +48,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='move_id']" position="after">
                 <field name="commission_move_id" readonly="1" groups="account.group_account_readonly"/>
+                <field name="card_sale_payment_move_id" readonly="1" groups="account.group_account_readonly"/>
             </xpath>
         </field>
     </record>

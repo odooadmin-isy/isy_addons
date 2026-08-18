@@ -21,7 +21,7 @@
             <field name="name">ISY Card Usage History Tree</field>
             <field name="model">isy.card.usage.history</field>
             <field name="arch" type="xml">
-                <tree default_order='name desc'>
+                <tree default_order='create_date desc'>
                     <field name="partner_id"/>
                     <field name="student_number"/>
                     <field name="ptype"/>
