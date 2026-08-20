@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_card_usage_report_wizard" model="ir.ui.view">
+        <field name="name">card.usage.report.wizard.form</field>
+        <field name="model">card.usage.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Card Usage Report">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                        <field name="config_ids" widget="many2many_tags"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate_report" type="object"
+                            string="Generate" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_card_usage_report_wizard" model="ir.actions.act_window">
+        <field name="name">Card Usage Report</field>
+        <field name="res_model">card.usage.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_card_usage_report"
+              name="Card Usage Report"
+              parent="isy_pos_addon.menu_report_root"
+              action="action_card_usage_report_wizard"
+              sequence="10"/>
+
+</odoo>

@@ -26,6 +26,7 @@
                     <field name="student_number"/>
                     <field name="ptype"/>
                     <field name="order_ref"/>
+                    <field name="pos_config_id"/>
                     <field name="barcode"/>
                     <field name="amount"/>
                     <field name="create_date"/>

@@ -53,6 +53,6 @@ class CardTopupDeduction(models.Model):
             'amount': self.amount,
             'barcode': self.barcode,
             'student_number': self.partner_id.student_number,
-            'ptype': 'Deduction'
+            'ptype': 'DEDUCTION'
         })
         self.state = 'done'

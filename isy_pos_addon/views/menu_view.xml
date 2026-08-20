@@ -22,5 +22,12 @@
               name="Partner Card Balance"
               parent="isy_menu_isy_card"
               sequence="30"/>
+
+            <!-- Report Root Menu -->
+            <menuitem id="menu_report_root"
+              name="Report"
+              parent="isy_menu_isy_card"
+              sequence="40"/>
+
     </data>
 </odoo>

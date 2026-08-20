@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_card_usage_xlsx" model="ir.actions.report">
+        <field name="name">Card Usage XLSX</field>
+        <field name="model">card.usage.report.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">isy_pos_addon.card_usage_xlsx</field>
+        <field name="report_file">card_usage</field>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Card Usage %s to %s' % (object.date_from, object.date_to)</field>
+    </record>
+
+    <record id="action_card_recharge_xlsx" model="ir.actions.report">
+        <field name="name">Card Recharge XLSX</field>
+        <field name="model">card.recharge.report.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">isy_pos_addon.card_recharge_xlsx</field>
+        <field name="report_file">card_recharge</field>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Card Recharge %s to %s' % (object.date_from, object.date_to)</field>
+    </record>
+</odoo>

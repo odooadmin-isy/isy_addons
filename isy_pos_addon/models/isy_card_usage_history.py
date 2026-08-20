@@ -14,3 +14,4 @@ class CardUsageHistory(models.Model):
     amount = fields.Float(string='Amount', required=True)
     ptype = fields.Char(string='Payment Type')
     order_ref = fields.Char(string='Order Reference')
+    pos_config_id = fields.Many2one('pos.config', string='Point of Sale')
