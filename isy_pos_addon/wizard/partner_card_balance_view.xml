@@ -41,5 +41,5 @@
               name="Partner Card Balance"
               parent="isy_pos_addon.menu_partner_card_balance_root"
               action="action_partner_card_balance_wizard"
-              sequence="10"/>
+              sequence="20"/>
 </odoo>

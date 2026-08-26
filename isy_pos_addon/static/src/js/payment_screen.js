@@ -37,8 +37,19 @@ patch(PaymentScreen.prototype, {
         const splitPayments = this.paymentLines.filter(
             (payment) => payment.payment_method.split_transactions
         );
+        const negativePayments = this.paymentLines.some(
+            (payment) => payment.amount < 0
+        );
+        if (negativePayments) {
+            await this.popup.add(ErrorPopup, {
+                title: _t("Negative Payment"),
+                body: _t("Negative payments are not allowed."),
+            });
+            return false;
+        }
         console.log("useCard:", useCard);
         console.log("splitPayments:", splitPayments);
+        console.log("negativePayments:", negativePayments);
         if (useCard.length) {
             console.log("Barcode payment method selected!");
             const { confirmed, payload: barcode } = await this.popup.add(TextInputPopup, {

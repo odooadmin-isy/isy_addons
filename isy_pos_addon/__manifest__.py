@@ -25,6 +25,7 @@
        'wizard/partner_card_balance_view.xml',
        'wizard/card_usage_report_wizard_view.xml',
        'wizard/card_recharge_report_wizard_view.xml',
+       'wizard/pos_payment_summary_wizard_view.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [

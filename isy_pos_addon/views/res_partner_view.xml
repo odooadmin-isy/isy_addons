@@ -20,4 +20,47 @@
             </page>
         </field>
     </record>
+
+    <!-- Partner Card Balance-->
+    <record model="ir.ui.view" id="res_partner_form_inherit_partner_card_balance">
+        <field name="name">Partner Card Balance Search</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="card_barcode" />
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Card Recharge History Tree -->
+    <record model="ir.ui.view" id="res_partner_form_inherit_partner_card_balance_tree">
+        <field name="name">ISY Card Recharge History Tree</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="card_barcode" string="Barcode" />
+                <field name="card_balance" string="Balance" />
+            </tree>
+        </field>
+    </record>
+
+
+    <!-- Partner Card Balance Action -->
+    <record model="ir.actions.act_window" id="menu_partner_card_balance_action">
+        <field name="name">Partner Card Balance</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">tree</field>
+        <field name="domain">[('card_barcode', '!=', False)]</field>
+        <field name="view_id" ref="res_partner_form_inherit_partner_card_balance_tree"/>
+    </record>
+
+    <!-- Partner Card Balance Menu --> 
+    <menuitem
+        name="Partner Card Balance List"
+        id="menu_partner_card_balance_list"
+        parent="isy_pos_addon.menu_partner_card_balance_root"
+        action="menu_partner_card_balance_action"
+        sequence="10"/>
 </odoo>

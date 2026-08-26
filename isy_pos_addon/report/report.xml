@@ -19,4 +19,16 @@
         <field name="binding_type">report</field>
         <field name="print_report_name">'Card Recharge %s to %s' % (object.date_from, object.date_to)</field>
     </record>
+
+    <record id="action_pos_payment_summary_xlsx" model="ir.actions.report">
+        <field name="name">Daily Payment Summary XLSX</field>
+        <field name="model">pos.payment.summary.wizard</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">isy_pos_addon.pos_payment_summary_xlsx</field>
+        <field name="report_file">pos_payment_summary</field>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Payment Summary %s to %s' % (object.date_from, object.date_to)</field>
+    </record>
+
+
 </odoo>
