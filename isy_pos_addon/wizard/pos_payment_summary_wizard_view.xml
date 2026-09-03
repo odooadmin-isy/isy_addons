@@ -58,8 +58,12 @@
                     </group>
                 </group>
                 <footer>
+                    <button name="action_generate_pivot"
+                            type="object"
+                            string="View Pivot"
+                            class="btn-primary"/>
                     <button name="action_generate_report" type="object"
-                            string="Generate" class="btn-primary"/>
+                            string="Print" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

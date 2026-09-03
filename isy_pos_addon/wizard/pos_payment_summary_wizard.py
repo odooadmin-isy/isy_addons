@@ -114,3 +114,22 @@ class PosPaymentSummaryWizard(models.TransientModel):
         action = self.env.ref('isy_pos_addon.action_pos_payment_summary_xlsx').report_action(self)
         action['close_on_report_download'] = True
         return action
+
+    def action_generate_pivot(self):
+        self.ensure_one()
+
+        domain = self._get_domain()
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('POS Payment Summary'),
+            'res_model': 'pos.payment',
+            'view_mode': 'pivot,tree',
+            'views': [
+                (self.env.ref(
+                    'isy_pos_addon.view_pos_payment_pivot'
+                ).id, 'pivot'),
+            ],
+            'domain': domain,
+            'target': 'current',
+        }
