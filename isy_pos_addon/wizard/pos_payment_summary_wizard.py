@@ -65,10 +65,19 @@ class PosPaymentSummaryWizard(models.TransientModel):
             ('payment_date', '<', fields.Datetime.to_datetime(self.date_to) + timedelta(days=1)),
             ('pos_order_id.state', 'in', ['paid', 'done', 'invoiced']),
         ]
+
         if self.config_ids:
-            domain.append(('pos_order_id.config_id', 'in', self.config_ids.ids))
+            config_ids = self.config_ids.ids
         else:
-            domain.append(('pos_order_id.config_id', 'in', self.env['pos.config'].search([('is_vendor_payment', '=', True)]).ids))
+            # Restrict POS users to their allowed POS configurations
+            if self.env.user.has_group('point_of_sale.group_pos_user'):
+                config_ids = self.env.user.allowed_pos.ids
+            else:
+                config_ids = self.env['pos.config'].search([
+                    ('is_vendor_payment', '=', True)
+                ]).ids
+
+        domain.append(('pos_order_id.config_id', 'in', config_ids))
 
         if self.payment_method_ids:
             domain.append(('payment_method_id', 'in', self.payment_method_ids.ids))

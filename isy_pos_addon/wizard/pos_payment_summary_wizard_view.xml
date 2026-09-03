@@ -33,6 +33,7 @@
         <field name="name">Daily Payment Summary</field>
         <field name="res_model">pos.payment.summary.wizard</field>
         <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_pos_addon.view_pos_payment_summary_wizard"/>
         <field name="target">new</field>
     </record>
 
@@ -41,5 +42,42 @@
               parent="isy_pos_addon.menu_report_root"
               action="action_pos_payment_summary_wizard"
               sequence="20"/>
+
+    <!-- POS Payment Summary Report in Point of Sale -->
+    <record id="view_pos_payment_summary_wizard_in_pos" model="ir.ui.view">
+        <field name="name">pos.payment.summary.wizard.form.in.pos</field>
+        <field name="model">pos.payment.summary.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Daily Payment Summary">
+                <group>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                    <group>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_generate_report" type="object"
+                            string="Generate" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pos_payment_summary_wizard_in_pos" model="ir.actions.act_window">
+        <field name="name">Daily Payment Summary</field>
+        <field name="res_model">pos.payment.summary.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="isy_pos_addon.view_pos_payment_summary_wizard_in_pos"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_pos_payment_summary_in_pos"
+              name="Daily Payment Summary"
+              parent="point_of_sale.menu_point_root"
+              action="action_pos_payment_summary_wizard_in_pos"
+              sequence="10"/>
 
 </odoo>
