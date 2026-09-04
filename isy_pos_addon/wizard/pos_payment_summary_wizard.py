@@ -71,7 +71,12 @@ class PosPaymentSummaryWizard(models.TransientModel):
         else:
             # Restrict POS users to their allowed POS configurations
             if self.env.user.has_group('point_of_sale.group_pos_user'):
-                config_ids = self.env.user.allowed_pos.ids
+                if self.env.user.has_group('point_of_sale.group_pos_manager'):
+                    config_ids = self.env['pos.config'].search([
+                        ('is_vendor_payment', '=', True)
+                    ]).ids
+                else:
+                    config_ids = self.env.user.allowed_pos.ids
             else:
                 config_ids = self.env['pos.config'].search([
                     ('is_vendor_payment', '=', True)

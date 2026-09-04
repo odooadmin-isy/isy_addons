@@ -8,6 +8,7 @@
             <field name="model">isy.card.topup.deduction</field>
             <field name="arch" type="xml">
                 <search>
+                    <field name="ptype" string="Payment Type"/>
                     <filter string="Created Date" name="group_created_date" context="{'group_by': 'create_date'}"/>
                 </search>
             </field>
@@ -22,6 +23,7 @@
                     <field name="partner_id"/>
                     <field name="barcode"/>
                     <field name="usage_type"/>
+                    <field name="ptype"/>
                     <field name="amount"/>
                     <field name="date"/>
                     <field name="state"/>
@@ -47,15 +49,23 @@
                                 type="object"
                                 class="btn-primary"
                                 invisible="usage_type != 'deduction' or state != 'draft'"/>
+
+                        <button name="action_cancel"
+                                string="Cancel"
+                                type="object"
+                                class="btn-danger"
+                                invisible="state != 'draft'"/>
+                        <field name="state" widget="statusbar"/>
                     </header>
 
                     <sheet>
                         <group>
                             <group>
-                                <field name="barcode"/>
+                                <field name="barcode" readonly="state not in ('draft')"/>
                                 <field name="partner_id" force_save="1"/>
                                 <field name="usage_type" readonly="1" force_save="1"/>
-                                <field name="amount"/>
+                                <field name="ptype" readonly="state not in ('draft')"/>
+                                <field name="amount" readonly="state not in ('draft')"/>
                                 <field name="state" invisible="1"/>
                             </group>
                         </group>

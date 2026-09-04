@@ -12,10 +12,12 @@ class CardTopupDeduction(models.Model):
     partner_id = fields.Many2one('res.partner', string='Partner', readonly=True)
     name = fields.Char(string='Name', related='partner_id.name')
     usage_type = fields.Selection([('topup', 'Topup'), ('deduction', 'Deduction')], string='Type', required=True)
+    ptype = fields.Selection([('cash', 'CASH'), ('mmqr', 'MMQR'), ('other', 'OTHER')],
+                string='Payment Type', default='cash', track_visibility='onchange')
     barcode = fields.Char(string='Barcode', track_visibility='onchange')
     amount = fields.Float(string='Amount', required=True, track_visibility='onchange')
     date = fields.Datetime(string='Date', required=True, default=lambda self: fields.Datetime.now())
-    state = fields.Selection([('draft', 'Draft'), ('done', 'Done')], string='State',
+    state = fields.Selection([('draft', 'Draft'), ('done', 'Done'), ('cancelled', 'Cancelled')], string='State',
                     required=True, default='draft', track_visibility='onchange')
 
     @api.onchange('barcode')
@@ -34,6 +36,8 @@ class CardTopupDeduction(models.Model):
         self.ensure_one()
         if self.amount <= 0:
             raise ValidationError(_('Amount must be greater than 0.00.'))
+        if not self.ptype:
+            raise ValidationError(_('Payment Type is required.'))
 
         self.partner_id.card_balance += self.amount
         self.env['isy.card.recharge.history'].sudo().create({
@@ -41,12 +45,17 @@ class CardTopupDeduction(models.Model):
             'barcode': self.barcode,
             'student_number': self.partner_id.student_number,
             'amount': self.amount,
-            'ptype': 'CASH'
+            'ptype': self.ptype.upper()
         })
         self.state = 'done'
 
     def action_deduction(self):
         self.ensure_one()
+        if self.amount <= 0:
+            raise ValidationError(_('Amount must be greater than 0.00.'))
+        if not self.ptype:
+            raise ValidationError(_('Payment Type is required.'))
+
         self.partner_id.card_balance -= self.amount
         self.env['isy.card.usage.history'].sudo().create({
             'partner_id': self.partner_id.id,
@@ -56,3 +65,7 @@ class CardTopupDeduction(models.Model):
             'ptype': 'DEDUCTION'
         })
         self.state = 'done'
+
+    def action_cancel(self):
+        self.ensure_one()
+        self.state = 'cancelled'
