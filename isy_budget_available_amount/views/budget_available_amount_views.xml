@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_budget_available_amount_wizard" model="ir.ui.view">
+        <field name="name">budget.available.amount.wizard.form</field>
+        <field name="model">budget.available.amount.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Budget Available Amount">
+                <group>
+                    <field name="company_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                    <field name="fiscal_year_id"
+                           domain="['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+                           options="{'no_create': True}"/>
+                </group>
+                <footer>
+                    <button name="action_generate" string="Generate" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_budget_available_amount_wizard" model="ir.actions.act_window">
+        <field name="name">Budget Available Amount</field>
+        <field name="res_model">budget.available.amount.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_budget_available_amount_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_budget_available_amount_search" model="ir.ui.view">
+        <field name="name">budget.available.amount.search</field>
+        <field name="model">budget.available.amount</field>
+        <field name="arch" type="xml">
+            <search string="Budget Available Amount">
+                <field name="name" string="Account Name"
+                       filter_domain="[('name', 'ilike', self)]"/>
+                <field name="account_code" string="Account Code"
+                       filter_domain="[('account_code', 'ilike', self)]"/>
+                <field name="group_name"/>
+                <field name="company_id"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Group" name="group_group" context="{'group_by': 'group_name'}"/>
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_budget_available_amount_tree" model="ir.ui.view">
+        <field name="name">budget.available.amount.tree</field>
+        <field name="model">budget.available.amount</field>
+        <field name="arch" type="xml">
+            <tree string="Budget Available Amount" create="false" edit="false"
+                  decoration-danger="available_amount &lt; 0"
+                  default_order="group_name, company_id, account_code">
+                <header>
+                    <button name="action_refresh" type="object" string="Refresh" display="always"
+                            class="btn-primary" title="Reload reserved lines from current PO, advance, reimbursement, and draft entries"/>
+                </header>
+                <field name="account_code"/>
+                <field name="name"/>
+                <field name="budget_id" column_invisible="True"/>
+                <field name="fiscal_year_id" optional="hide"/>
+                <field name="display_planned_amount" sum="Total Planned" string="Planned Amount" digits="[16, 0]"/>
+                <field name="display_allowed_amount" sum="Total Allowed" string="Allowed Amount" digits="[16, 0]"/>
+                <field name="practical_amount" sum="Total Practical" digits="[16, 0]"/>
+                <field name="remaining_amount" sum="Total Remaining" digits="[16, 0]"/>
+                <field name="reserved_amount" sum="Total Reserved" digits="[16, 0]"/>
+                <field name="available_amount" sum="Total Available" digits="[16, 0]"/>
+                <field name="group_name" optional="hide"/>
+                <field name="company_id" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_budget_available_amount_form" model="ir.ui.view">
+        <field name="name">budget.available.amount.form</field>
+        <field name="model">budget.available.amount</field>
+        <field name="arch" type="xml">
+            <form string="Budget Available Amount" create="false" edit="false">
+                <header>
+                    <button name="refresh_reserved_lines" type="object" string="Refresh"
+                            class="btn-primary" title="Reload reserved lines from current documents"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="account_code"/>
+                            <field name="name"/>
+                            <field name="budget_id"/>
+                            <field name="fiscal_year_id"/>
+                        </group>
+                        <group>
+                            <field name="planned_amount"/>
+                            <field name="allowed_amount"/>
+                            <field name="practical_amount"/>
+                            <field name="remaining_amount"/>
+                            <field name="reserved_amount"/>
+                            <field name="available_amount"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="group_name"/>
+                        <field name="company_id"/>
+                    </group>
+                    <notebook>
+                        <page string="Reserved Details" name="reserved_details">
+                            <field name="reserved_line_ids" nolabel="1">
+                                <tree create="false" edit="false" delete="false"
+                                      decoration-muted="amount == 0">
+                                    <field name="document_type"/>
+                                    <field name="document_name"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="res_model" column_invisible="True"/>
+                                    <field name="res_id" column_invisible="True"/>
+                                    <button name="action_open_document" type="object"
+                                            string="Open" icon="fa-external-link"
+                                            invisible="not res_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <menuitem id="menu_budget_available_amount_root"
+              name="Budget Available Amount"
+              parent="mt_isy.isy_menu_budget_template_root"
+              sequence="3"/>
+
+    <menuitem id="menu_budget_available_amount"
+              name="ISY Budget Available Amount"
+              parent="isy_budget_available_amount.menu_budget_available_amount_root"
+              action="action_budget_available_amount_wizard"
+              sequence="10"/>
+</odoo>

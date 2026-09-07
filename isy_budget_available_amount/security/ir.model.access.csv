@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_budget_available_amount,access_budget_available_amount,model_budget_available_amount,account.group_account_user,1,1,1,1
+access_budget_available_amount_line,access_budget_available_amount_line,model_budget_available_amount_line,account.group_account_user,1,1,1,1
+access_budget_available_amount_wizard,access_budget_available_amount_wizard,model_budget_available_amount_wizard,account.group_account_user,1,1,1,1
