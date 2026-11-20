@@ -1,0 +1,9 @@
+[submodule "custom_addons"]
+	path = custom_addons
+	url = git@github.com:odooadmin-isy/custom_addons.git
+[submodule "external_addons"]
+	path = external_addons
+	url = git@github.com:odooadmin-isy/external_addons.git
+[submodule "paid_addons"]
+	path = paid_addons
+	url = git@github.com:odooadmin-isy/paid_addons.git
